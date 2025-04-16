@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -45,6 +46,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.jitbook.ui.theme.JITBookTheme
+import com.example.jitbook.ui.theme.navigation.BookContentType
 import kotlinx.coroutines.launch
 
 
@@ -52,19 +55,18 @@ private data class OtpField(
     val text: String,
     val index: Int,
     val focusRequester: FocusRequester? = null,
+    val isFocused: Boolean = false // 👈 thêm dòng này
+
 )
 
 @Composable
 fun OtpInputField(
+    contentType: BookContentType,
     otp: MutableState<String>,
     count: Int = 5,
     otpBoxModifier: Modifier = Modifier
-        .border(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.primary,
-        )
         .background(
-            color = MaterialTheme.colorScheme.primaryContainer,
+            color = MaterialTheme.colorScheme.background,
         ),
     otpTextType: KeyboardType = KeyboardType.Number,
     textColor: Color = Color.Black,
@@ -109,9 +111,9 @@ fun OtpInputField(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        repeat(count) {
-            index ->
+        repeat(count) { index ->
             OtpBox(
+                contentType = contentType,
                 modifier = otpBoxModifier,
                 otpValue = otpFieldsValue[index].value,
                 textType = otpTextType,
@@ -136,9 +138,81 @@ fun OtpInputField(
             )
         }
     }
-
-
 }
+
+@Composable
+private fun OtpBox(
+    contentType: BookContentType,
+    modifier: Modifier,
+    otpValue: OtpField,
+    textType: KeyboardType = KeyboardType.Number,
+    textColor: Color = Color.Black,
+    isLastItem: Boolean,
+    totalBoxCount: Int,
+    onValueChange: (String) -> Unit,
+    onFocusSet: (FocusRequester) -> Unit,
+    onNext: () -> Unit,
+) {
+    val focusManager = LocalFocusManager.current
+    val focusRequest = otpValue.focusRequester ?: FocusRequester()
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp.dpToPx().toInt()
+    val paddingValue = 5
+    val totalBoxSize = when (contentType) {
+            BookContentType.LIST_ONLY -> {
+            (screenWidth / totalBoxCount) - (paddingValue * totalBoxCount) - 30
+        }
+
+        else -> {
+            (screenWidth / totalBoxCount) - (paddingValue * totalBoxCount) -250
+        }
+    }
+    val isFocused = otpValue.text.isNotEmpty() // bạn có thể dùng `isFocused` khác nếu có
+
+    // Tuỳ chỉnh màu viền và nền
+    val borderColor = if (isFocused) Color(0xFFFF9800) else Color(0xFFE0E0E0)
+    val backgroundColor = if (isFocused) Color(0xFFFFF8E1) else Color.White
+
+    Box(
+        modifier = modifier
+            .size(totalBoxSize.pxToDp())
+            .border(2.dp, borderColor, RoundedCornerShape(12.dp))
+            .background(backgroundColor, RoundedCornerShape(12.dp))
+            .focusRequester(focusRequest)
+            .onGloballyPositioned {
+                onFocusSet(focusRequest)
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        BasicTextField(
+            value = TextFieldValue(otpValue.text, TextRange(otpValue.text.length)),
+            onValueChange = {
+                if (it.text != otpValue.text) {
+                    onValueChange(it.text)
+                }
+            },
+            textStyle = MaterialTheme.typography.titleLarge.copy(
+                textAlign = TextAlign.Center,
+                color = textColor
+            ),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = textType,
+                imeAction = if (isLastItem) ImeAction.Done else ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = { onNext() },
+                onDone = {
+                    keyboardController?.hide()
+                    focusManager.clearFocus()
+                }
+            ),
+            singleLine = true,
+            visualTransformation = getVisualTransformation(textType),
+        )
+    }
+}
+
 private fun focusNextBox(
     index: Int,
     count: Int,
@@ -153,6 +227,7 @@ private fun focusNextBox(
         }
     }
 }
+
 private fun handleOtpInputChange(
     index: Int,
     count: Int,
@@ -201,132 +276,43 @@ private fun handleOtpInputChange(
 }
 
 
-
 @Composable
 fun Dp.dpToPx() = with(LocalDensity.current) { this@dpToPx.toPx() }
 
 @Composable
 fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }
+
 @Composable
 private fun getVisualTransformation(textType: KeyboardType) =
     if (textType == KeyboardType.NumberPassword || textType == KeyboardType.Password) PasswordVisualTransformation() else VisualTransformation.None
 
-@Composable
-private fun OtpBox(
-    modifier: Modifier,
-    otpValue: OtpField, // Giá trị hiện tại của ô nhập OTP này.
-    textType: KeyboardType = KeyboardType.Number,
-    textColor: Color = Color.Black,
-    isLastItem: Boolean, // Có phải ô này là ô cuối cùng trong dãy OTP hay không
-    totalBoxCount: Int, // Tổng số ô OTP (để tính toán giao diện).
-    onValueChange: (String) -> Unit, // Hàm gọi lại khi giá trị ô nhập thay đổi.
-    onFocusSet: (FocusRequester) -> Unit, // Hàm gọi lại để thiết lập FocusRequester.
-    onNext: () -> Unit, // Hàm gọi lại khi cần chuyển focus sang ô kế tiếp.
-) {
-    val focusManager = LocalFocusManager.current
-    val focusRequest = otpValue.focusRequester ?: FocusRequester()
-    val keyboardController = LocalSoftwareKeyboardController.current
-
-//    Tính toán kích thước của ô dựa trên chiều rộng màn hình và tổng số ô.
-//    Nếu bạn đang sử dụng mã này trong Kotlin Multiplatform Mobile,
-//    bạn có thể sử dụng LocalWindowInfo.current.containerSize.width để lấy chiều rộng màn hình.
-//    Nếu bạn đang phát triển ứng dụng Android, bạn có thể lấy chiều rộng màn hình thông qua
-//    LocalConfiguration.current.screenWidthDp.
-
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp.dpToPx().toInt()
-    val paddingValue = 5
-    val totalBoxSize = (screenWidth / totalBoxCount) - paddingValue * totalBoxCount
-
-    Box(
-        modifier = modifier
-            .size(totalBoxSize.pxToDp()),
-        contentAlignment = Alignment.Center,
-        ) {
-        BasicTextField(
-            value = TextFieldValue(otpValue.text, TextRange(maxOf(0, otpValue.text.length))),
-            onValueChange = {
-
-                if(!it.text.equals(otpValue)){
-                    onValueChange(it.text)
-                }
-            },
-
-            modifier = Modifier
-                .testTag("otpBox${otpValue.index}")
-                .focusRequester(focusRequest)
-                .onGloballyPositioned {
-                    onFocusSet(focusRequest)
-                },
-            textStyle = MaterialTheme.typography.titleLarge.copy(
-                textAlign = TextAlign.Center,
-                color = textColor
-            ),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = textType,
-                imeAction = if (isLastItem) ImeAction.Done else ImeAction.Next
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = {
-                    onNext()
-                },
-                onDone = {
-                    // Hide keyboard and clear focus when done.
-                    keyboardController?.hide()
-                    focusManager.clearFocus()
-                }
-            ),
-            singleLine = true,
-            visualTransformation = getVisualTransformation(textType),
-        )
-    }
-}
 
 @Preview
 @Composable
 fun OtpView_Preivew() {
-    MaterialTheme {
-        val otpValue = remember {
-            mutableStateOf("124")
-        }
-        Column(
-            modifier = Modifier.padding(40.pxToDp()),
-            verticalArrangement = Arrangement.spacedBy(20.pxToDp())
+    JITBookTheme(
+        darkTheme = false,
+        dynamicColor = false
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
         ) {
             OtpInputField(
-                otp = otpValue,
+                otp = remember { mutableStateOf("") },
                 count = 4,
-                otpBoxModifier = Modifier
-                    .border(1.pxToDp(), Color.Black)
-                    .background(Color.White),
-                otpTextType = KeyboardType.Number
-            )
-
-            OtpInputField(
-                otp = otpValue,
-                count = 4,
-                otpTextType = KeyboardType.NumberPassword,
-                otpBoxModifier = Modifier
-                    .border(3.pxToDp(), Color.Gray)
-                    .background(Color.White)
-            )
-
-            OtpInputField(
-                otp = otpValue,
-                count = 5,
-                textColor = MaterialTheme.colorScheme.onBackground,
-                otpBoxModifier = Modifier
-                    .border(7.pxToDp(), Color(0xFF277F51), shape = RoundedCornerShape(12.pxToDp()))
-            )
-
-            OtpInputField(
-                otp = otpValue,
-                count = 5,
                 otpBoxModifier = Modifier
                     .border(
-                        border = BorderStroke(6.pxToDp(), Color.DarkGray),
-                        shape = RoundedCornerShape(4.dp)
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.primary,
                     )
+                    .background(
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                    ),
+                textColor = Color.Black,
+                contentType = BookContentType.LIST_AND_DETAIL
             )
         }
+
     }
 }

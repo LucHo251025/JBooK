@@ -1,9 +1,16 @@
 package com.example.jitbook.ui.theme.components
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -25,70 +32,83 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TransformedText
-import androidx.compose.ui.unit.TextUnit
-import com.example.jitbook.ui.theme.JITBookTheme
 import androidx.compose.ui.unit.sp
+import com.example.jitbook.ui.theme.JITBookTheme
 
 class CustomPasswordVisualTransformation : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
         val original = PasswordVisualTransformation().filter(text)
-        val transformed = AnnotatedString("●".repeat(text.length)) // Thay đổi dấu chấm thành "●" (dấu chấm lớn hơn)
+        val transformed =
+            AnnotatedString("●".repeat(text.length)) // Thay đổi dấu chấm thành "●" (dấu chấm lớn hơn)
         return TransformedText(transformed, original.offsetMapping)
     }
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PassWord(
+    fun BookPasswordField(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    keyboardType: KeyboardType = KeyboardType.Password,
-    visualTransformation: VisualTransformation = CustomPasswordVisualTransformation()
 ) {
-
     var isPasswordVisible by remember { mutableStateOf(false) }
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = {
-            Text(
-                label,
-                color = MaterialTheme.colorScheme.onPrimary,
+
+    Column(modifier = modifier.fillMaxWidth()) {
+        // Label
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+
+        // Ô nhập + icon
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            BasicTextField(
+                value = value,
+                onValueChange = onValueChange,
+                textStyle = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground,
+
+                ),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 4.dp), // Padding gọn
+
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             )
-                },
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(3.dp),
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType), // Cấu hình bàn phím
-        visualTransformation = if (isPasswordVisible) VisualTransformation.None else visualTransformation, // Sử dụng VisualTransformation tùy chỉnh
 
-
-        // ✅ Cập nhật colors đúng cách
-        colors = TextFieldDefaults.textFieldColors(
-            focusedIndicatorColor = MaterialTheme.colorScheme.primary, // Màu viền dưới khi focus
-            unfocusedIndicatorColor = MaterialTheme.colorScheme.primary, // Màu viền dưới khi không focus
-            cursorColor = MaterialTheme.colorScheme.primary // Màu con trỏ nhập liệu
-
-        ),
-        trailingIcon = {
             IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
                 Icon(
                     imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                    contentDescription = if (isPasswordVisible) "Ẩn mật khẩu" else "Hiển thị mật khẩu",
-                    tint = MaterialTheme.colorScheme.primary // Màu icon
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
         }
+
+        // Đường kẻ phía dưới
+        Divider(
+            color = Color(0xFFFFA000),
+            thickness = 2.dp
         )
+    }
 }
+
+
 @Preview
 @Composable
 fun PassWordPreview(
@@ -96,16 +116,15 @@ fun PassWordPreview(
     JITBookTheme(
         darkTheme = isSystemInDarkTheme(), dynamicColor = false
     ) {
-        PassWord(
+        BookPasswordField(
             label = "Enter your password",
             value = "",
             onValueChange = {},
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(3.dp),
-            keyboardType = KeyboardType.Password,
-            visualTransformation = VisualTransformation.None
-        )
+
+            )
     }
 
 }

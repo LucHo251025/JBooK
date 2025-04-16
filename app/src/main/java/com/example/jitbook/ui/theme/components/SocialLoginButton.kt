@@ -1,11 +1,14 @@
 package com.example.jitbook.ui.theme.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -47,7 +50,7 @@ fun SocialLoginButton(
         Icon(
             painter = servicesIcon,
             contentDescription = null,
-            tint = Color.Unspecified ,// Đảm bảo không có tint nào được áp dụng
+            tint = Color.Unspecified,// Đảm bảo không có tint nào được áp dụng
             modifier = Modifier
                 .padding(end = 12.dp)
         )
@@ -60,15 +63,106 @@ fun SocialLoginButton(
 
 }
 
+@Composable
+fun SocialGoogleButton(
+    servicesName: String,
+    servicesIcon: Painter,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val isDarkMode = isSystemInDarkTheme()
+
+    Button(
+        onClick = onClick,
+        modifier = modifier
+            .height(56.dp)
+            .fillMaxWidth()
+            .then(
+                if (!isDarkMode) Modifier.border(
+                    width = 1.dp,
+                    color = Color.Gray,
+                    shape = RoundedCornerShape(25.dp)
+                ) else Modifier
+            )
+            .clip(RoundedCornerShape(8.dp)),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.onPrimary // Đặt màu nền tuỳ chỉnh, ví dụ: màu Facebook
+        )
+    ) {
+        Icon(
+            painter = servicesIcon,
+            contentDescription = null,
+            tint = Color.Unspecified,// Đảm bảo không có tint nào được áp dụng
+            modifier = Modifier
+                .padding(end = 12.dp)
+        )
+        Text(
+            text = servicesName,
+            color = MaterialTheme.colorScheme.onSecondary,
+            style = MaterialTheme.typography.titleMedium
+        )
+    }
+
+}
+@Composable
+fun SocialButton(
+    servicesIcon: Painter,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val isDarkMode = isSystemInDarkTheme()
+
+    Button(
+        onClick = onClick,
+        modifier = modifier
+            .height(56.dp)
+            .width(80.dp)
+            .then(
+                if (!isDarkMode) Modifier.border(
+                    width = 1.dp,
+                    color = Color.Gray,
+                    shape = RoundedCornerShape(25.dp)
+                ) else Modifier
+            )
+            .clip(RoundedCornerShape(8.dp)),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.onPrimary
+        ),
+        contentPadding = PaddingValues(0.dp) //  bỏ padding mặc định của Button
+    ) {
+        Icon(
+            painter = servicesIcon,
+            contentDescription = null,
+            tint = Color.Unspecified,
+            modifier = Modifier
+                .size(24.dp) // bạn có thể chỉnh lại kích thước nếu cần
+        )
+    }
+}
+
 @Preview
 @Composable
 fun SocialLoginButtonPreview() {
     JITBookTheme(
-        isSystemInDarkTheme(),
+        darkTheme = true,
         dynamicColor = false
     ) {
-        SocialLoginButton(
+        SocialGoogleButton(
             servicesName = "Google",
+            servicesIcon = painterResource(id = R.drawable.google),
+            onClick = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+fun SocialButtonPreview() {
+    JITBookTheme(
+        darkTheme = true,
+        dynamicColor = false
+    ) {
+        SocialButton(
             servicesIcon = painterResource(id = R.drawable.google),
             onClick = {}
         )

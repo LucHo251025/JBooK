@@ -58,6 +58,7 @@ dependencies {
 //    Hilt (Dependency Injection - DI)
     implementation("com.google.dagger:hilt-android:2.50")
     implementation(libs.androidx.espresso.core)
+    implementation(libs.androidx.core.i18n)
     kapt("com.google.dagger:hilt-compiler:2.50")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
 
@@ -79,6 +80,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-pager-indicators:0.34.0")
 
 
+    implementation(libs.material3.window.size)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

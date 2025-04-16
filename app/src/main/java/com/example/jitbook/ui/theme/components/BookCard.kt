@@ -29,87 +29,79 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.jitbook.data.model.Book
+import com.example.jitbook.ui.theme.navigation.BookContentType
+
 
 @Composable
 fun BookCard(
-    title: String,
-    imageUrl: String,
-    duration: String,
-    genres: String,
-    rating: Double,
-    ratingCount: Int,
+    book: Book,
     modifier: Modifier = Modifier,
     width: Dp = 220.dp,
     imageHeight: Dp = 250.dp,
     ) {
-    Card(
-        shape = RoundedCornerShape(16.dp),
-        modifier = modifier
-            .padding(16.dp)
-            .width(width),
-        elevation = CardDefaults.cardElevation(8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Black)
-    ) {
-        Column(
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
+        Card(
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier
+                .width(width),
+            elevation = CardDefaults.cardElevation(8.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.Black)
         ) {
             // Poster ảnh
             AsyncImage(
-                model = imageUrl,
-                contentDescription = title,
-                modifier = modifier
+                model = book.imageUrl,
+                contentDescription = book.title,
+                modifier = Modifier
                     .fillMaxWidth()
                     .height(imageHeight)
                     .clip(RoundedCornerShape(12.dp)),
                 contentScale = ContentScale.Crop
             )
+        }
 
-            Column(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .height(100.dp),
-                verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.CenterHorizontally
+        Column(
+            modifier = Modifier,
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+
             ) {
-                Spacer(modifier = modifier.height(12.dp))
 
-                // Tên phim
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                    color = Color.White
+            // Tên phim
+            Text(
+                text = book.title,
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onSecondary,
+            )
+
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Rating
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = null,
+                    tint = Color.Yellow,
+                    modifier = Modifier.size(16.dp)
                 )
-
-                // Thời lượng + thể loại
                 Text(
-                    text = "$duration • $genres",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.LightGray
+                    text = "${book.rating} ",
+                    color = MaterialTheme.colorScheme.onSecondary,
+                    style = MaterialTheme.typography.bodySmall
                 )
-
-                Spacer(modifier = modifier.height(4.dp))
-
-                // Rating
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = null,
-                        tint = Color.Yellow,
-                        modifier = modifier.size(16.dp)
-                    )
-                    Text(
-                        text = "$rating ",
-                        color = Color.White,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Text(
-                        text = "($ratingCount)",
-                        color = Color.LightGray,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
+                Text(
+                    text = "(${book.genres})",
+                    color = MaterialTheme.colorScheme.onSecondary,
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
         }
     }
+
 }
 
 
@@ -117,11 +109,10 @@ fun BookCard(
 @Composable
 fun BookCardPreview() {
     BookCard(
-        title = "Book Title",
+        Book(title = "Book Title Example Example Example",
         imageUrl = "https://covers.openlibrary.org/b/id/14826244-L.jpg",
-        duration = "10h 30m",
         genres = "Fiction, Adventure",
         rating = 4.5,
         ratingCount = 1000
-    )
+        )   )
 }

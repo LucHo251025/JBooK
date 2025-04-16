@@ -28,12 +28,12 @@ fun BookList(
     ) {
         items(books.size) { index ->
             BookCard(
+                Book(
                 title = books[index].title,
                 imageUrl = books[index].imageUrl,
-                duration = books[index].duration,
                 genres = books[index].genres,
                 rating = books[index].rating,
-                ratingCount = books[index].ratingCount,
+                ratingCount = books[index].ratingCount),
                 modifier = modifier
                     .clickable(
                         onClick = { onBookClick(books[index]) }
@@ -53,7 +53,6 @@ fun BookListPreview() {
         Book(
             title = "Avengers - Infinity War",
             imageUrl = "https://image.tmdb.org/t/p/w500/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg",
-            duration = "2h29m",
             genres = "Action, Adventure, Sci-fi",
             rating = 4.8,
             ratingCount = 1222
@@ -61,7 +60,6 @@ fun BookListPreview() {
         Book(
             title = "Interstellar",
             imageUrl = "https://image.tmdb.org/t/p/w500/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
-            duration = "2h49m",
             genres = "Sci-fi, Drama",
             rating = 4.6,
             ratingCount = 982
@@ -69,7 +67,6 @@ fun BookListPreview() {
         Book(
             title = "The Dark Knight",
             imageUrl = "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
-            duration = "2h32m",
             genres = "Action, Crime, Drama",
             rating = 4.9,
             ratingCount = 1520
@@ -77,7 +74,6 @@ fun BookListPreview() {
         Book(
             title = "The Dark Knight",
             imageUrl = "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
-            duration = "2h32m",
             genres = "Action, Crime, Drama",
             rating = 4.9,
             ratingCount = 1520
@@ -85,7 +81,6 @@ fun BookListPreview() {
         Book(
             title = "The Dark Knight",
             imageUrl = "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
-            duration = "2h32m",
             genres = "Action, Crime, Drama",
             rating = 4.9,
             ratingCount = 1520
