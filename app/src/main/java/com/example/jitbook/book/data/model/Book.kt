@@ -1,0 +1,15 @@
+package com.example.jitbook.book.data.model
+
+data class Book(
+    val id: Int,
+    val title: String,
+    val imageUrl: String,
+    val authors: List<String>,
+    val description: String?,
+    val languages: List<String>,
+    val firstPublishYear: String?,
+    val averageRating: Double?,
+    val ratingsCount: Int?,
+    val numPages: Int?,
+    val numEdition: Int?,
+)

@@ -3,8 +3,9 @@ package com.example.jitbook
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.example.jitbook.ui.theme.navigation.BookContentType
-import com.example.jitbook.ui.theme.navigation.BookNavigationType
+import com.example.jitbook.book.theme.navigation.BookContentType
+import com.example.jitbook.book.theme.navigation.BookNavigationType
+
 
 @Composable
 fun BookApp(

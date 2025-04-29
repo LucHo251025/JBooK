@@ -22,8 +22,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.jitbook.ui.theme.JITBookTheme
-import com.example.jitbook.ui.theme.screens.LoginScreen
+import com.example.jitbook.book.theme.JITBookTheme
+
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)

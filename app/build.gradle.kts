@@ -1,11 +1,13 @@
-plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
-    id("com.google.devtools.ksp") version "1.9.20-1.0.14" // Plugin KSP (nếu bạn dùng)
-    id("kotlin-kapt") // Plugin KAPT
+    plugins {
+        alias(libs.plugins.android.application)
+        alias(libs.plugins.kotlin.android)
+        alias(libs.plugins.kotlin.compose)
+        id("com.google.devtools.ksp") version "1.9.20-1.0.14" // Plugin KSP (nếu bạn dùng)
+        id("kotlin-kapt")
+        alias(libs.plugins.google.gms.google.services) // Plugin KAPT
+        kotlin("plugin.serialization") version "1.9.20"
 
-}
+    }
 
 android {
     namespace = "com.example.jitbook"
@@ -59,6 +61,8 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.50")
     implementation(libs.androidx.espresso.core)
     implementation(libs.androidx.core.i18n)
+    implementation(libs.firebase.database)
+    implementation(libs.firebase.crashlytics.buildtools)
     kapt("com.google.dagger:hilt-compiler:2.50")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
 
@@ -79,6 +83,10 @@ dependencies {
     implementation("com.google.accompanist:accompanist-pager:0.34.0")
     implementation("com.google.accompanist:accompanist-pager-indicators:0.34.0")
 
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation("io.ktor:ktor-client-core:2.3.7")
+    implementation("io.ktor:ktor-client-cio:2.3.7") // hoặc ktor-client-okhttp tùy bạn
+    implementation("io.insert-koin:koin-androidx-compose:3.5.3")
 
     implementation(libs.material3.window.size)
 

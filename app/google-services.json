@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "926413392459",
+    "project_id": "jit-book",
+    "storage_bucket": "jit-book.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:926413392459:android:d6e06cc7d5b5b09aeadbce",
+        "android_client_info": {
+          "package_name": "com.example.jitbook"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1UBX_6wPMWHIPUUH_fxjpawAye9xCgVo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
