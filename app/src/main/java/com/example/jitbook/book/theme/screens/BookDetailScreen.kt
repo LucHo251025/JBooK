@@ -107,7 +107,7 @@ fun BookDetailScreenPreview() {
     ) {
         BookDetailScreen(
             book = Book(
-                id = 1,
+                id = "1",
                 title = "Title Book Title Sample Book Title",
                 imageUrl = "https://image.tmdb.org/t/p/w500/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
                 authors = listOf("Author One", "Author Two"),

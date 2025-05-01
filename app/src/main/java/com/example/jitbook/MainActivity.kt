@@ -19,10 +19,12 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.jitbook.book.theme.JITBookTheme
+import okhttp3.OkHttp
 
 
 class MainActivity : ComponentActivity() {
@@ -32,7 +34,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             JITBookTheme(
-                darkTheme = true,
+                darkTheme = false,
                 dynamicColor = false
             ) {
                 val layoutDirection = LocalLayoutDirection.current
@@ -47,7 +49,9 @@ class MainActivity : ComponentActivity() {
                                 .calculateEndPadding(layoutDirection)
                         )
                 ) {
-
+                    App(
+                        engine = remember { io.ktor.client.engine.okhttp.OkHttp.create()}
+                    )
                 }
             }
         }

@@ -1,6 +1,5 @@
 package com.example.jitbook.book.theme.screens
 
-import android.view.MenuItem.OnActionExpandListener
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +10,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,22 +30,29 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun HomePageScreen(
     viewModel: BookListViewModel = koinViewModel(),
-    onAction: (Book) -> Unit,
+    onBookClick: (Book) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val state by viewModel.state.collectAsState()
 
-    HomePage(
-        state = state,
-        onAction = { action ->
-            when (action) {
-                is BookListAction.OnBookClick -> onAction(action.book)
-                else -> Unit
-            }
-            viewModel.onAction(action)
-        },
-        modifier = modifier
-    )
+    val state by viewModel.state.collectAsState()
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+        contentAlignment = Alignment.Center
+    ) {
+        BookListScreen(
+            state = state,
+            onAction = { action ->
+                when (action) {
+                    is BookListAction.OnBookClick -> onBookClick(action.book)
+                    else -> Unit
+                }
+                viewModel.onAction(action)
+            },
+            modifier = modifier
+        )
+    }
 }
 
 @Composable
@@ -67,10 +75,6 @@ private fun HomePage(
             modifier = Modifier
                 .fillMaxSize()
         )
-
-
-
-
 }
 }
 
@@ -80,7 +84,7 @@ fun HomePageContent(
 ) {
     val sampleBooks = listOf(
         com.example.jitbook.book.data.model.Book(
-            id = 1,
+            id = "1",
             title = "Avengers - Infinity War",
             imageUrl = "https://image.tmdb.org/t/p/w500/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg",
             authors = listOf("F. Scott Fitzgerald"),
@@ -93,7 +97,7 @@ fun HomePageContent(
             numEdition = 10
         ),
         com.example.jitbook.book.data.model.Book(
-            id = 2,
+            id = "2",
             title = "Interstellar",
             imageUrl = "https://image.tmdb.org/t/p/w500/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
             authors = listOf("F. Scott Fitzgerald"),
@@ -106,7 +110,7 @@ fun HomePageContent(
             numEdition = 10
         ),
         com.example.jitbook.book.data.model.Book(
-            id = 3,
+            id = "3",
             title = "The Dark Knight",
             imageUrl = "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
             authors = listOf("F. Scott Fitzgerald"),
@@ -119,7 +123,7 @@ fun HomePageContent(
             numEdition = 10
         ),
         com.example.jitbook.book.data.model.Book(
-            id = 4,
+            id = "4",
             title = "The Dark Knight",
             imageUrl = "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
             authors = listOf("F. Scott Fitzgerald"),
@@ -132,7 +136,7 @@ fun HomePageContent(
             numEdition = 10
         ),
         com.example.jitbook.book.data.model.Book(
-            id = 5,
+            id = "5",
             title = "The Dark Knight",
             imageUrl = "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
             authors = listOf("F. Scott Fitzgerald"),
@@ -155,18 +159,17 @@ fun HomePageContent(
 
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun HomePageScreenPreview() {
     JITBookTheme(
         darkTheme = false,
         dynamicColor = false
     ) {
-        HomePageScreen(
-            viewModel = koinViewModel(),
-            onAction = {},
-
-        )
+//        HomePageScreen(
+//            viewModel = remember { BookListViewModel() },
+//            onBookClick = {},
+//        )
     }
 }
 

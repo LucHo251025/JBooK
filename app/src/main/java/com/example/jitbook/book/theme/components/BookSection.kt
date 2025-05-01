@@ -86,7 +86,7 @@ fun BookSectionPreview() {
     ) {
         val sampleBooks = listOf(
             com.example.jitbook.book.data.model.Book(
-                id =1,
+                id ="1",
                 title = "Avengers - Infinity War",
                 imageUrl = "https://image.tmdb.org/t/p/w500/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg",
                 authors = listOf("F. Scott Fitzgerald"),
@@ -99,7 +99,7 @@ fun BookSectionPreview() {
                 numEdition = 10
             ),
             com.example.jitbook.book.data.model.Book(
-                id = 2,
+                id = "2",
                 title = "Interstellar",
                 imageUrl = "https://image.tmdb.org/t/p/w500/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
                 authors = listOf("F. Scott Fitzgerald"),
@@ -112,7 +112,7 @@ fun BookSectionPreview() {
                 numEdition = 10
             ),
             com.example.jitbook.book.data.model.Book(
-                id = 3,
+                id = "3",
                 title = "The Dark Knight",
                 imageUrl = "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
                 authors = listOf("F. Scott Fitzgerald"),
@@ -125,7 +125,7 @@ fun BookSectionPreview() {
                 numEdition = 10
             ),
             com.example.jitbook.book.data.model.Book(
-                id = 4,
+                id = "4",
                 title = "The Dark Knight",
                 imageUrl = "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
                 authors = listOf("F. Scott Fitzgerald"),
@@ -138,7 +138,7 @@ fun BookSectionPreview() {
                 numEdition = 10
             ),
             com.example.jitbook.book.data.model.Book(
-                id = 5,
+                id = "5",
                 title = "The Dark Knight",
                 imageUrl = "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
                 authors = listOf("F. Scott Fitzgerald"),

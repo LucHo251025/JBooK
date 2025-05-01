@@ -87,6 +87,11 @@ dependencies {
     implementation("io.ktor:ktor-client-core:2.3.7")
     implementation("io.ktor:ktor-client-cio:2.3.7") // hoặc ktor-client-okhttp tùy bạn
     implementation("io.insert-koin:koin-androidx-compose:3.5.3")
+// Ktor Content Negotiation + kotlinx.serialization JSON
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
+    implementation("io.ktor:ktor-client-logging:2.3.7")
+    implementation("io.ktor:ktor-client-okhttp:2.3.7")
 
     implementation(libs.material3.window.size)
 

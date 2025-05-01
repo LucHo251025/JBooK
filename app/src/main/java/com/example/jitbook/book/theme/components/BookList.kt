@@ -2,52 +2,57 @@ package com.example.jitbook.book.theme.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.jitbook.book.data.model.Book
+import com.example.jitbook.book.theme.JITBookTheme
 
 
 @Composable
 fun BookList(
     books: List<com.example.jitbook.book.data.model.Book>,
     onBookClick: (com.example.jitbook.book.data.model.Book) -> Unit,
-    modifier: Modifier = Modifier)
-{
+    modifier: Modifier = Modifier,
+    scrollState: LazyGridState = rememberLazyGridState(),
+) {
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
+        state = scrollState,
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = 100.dp)
 
     ) {
-        items(books.size) { index ->
+        items(
+            items= books,
+            key = {it.id}
+        ) { book ->
             BookCard(
-                com.example.jitbook.book.data.model.Book(
-                    id = books[index].id,
-                    title = books[index].title,
-                    imageUrl = books[index].imageUrl,
-                    authors = books[index].authors,
-                    description = books[index].description,
-                    languages = books[index].languages,
-                    firstPublishYear = books[index].firstPublishYear,
-                    averageRating = books[index].averageRating,
-                    ratingsCount = books[index].ratingsCount,
-                    numPages = books[index].numPages,
-                    numEdition = books[index].numEdition
-
-                ),
+                book = book,
                 modifier = modifier
                     .clickable(
-                        onClick = { onBookClick(books[index]) }
+                        onClick = { onBookClick(book) }
                     ),
-                width = 220.dp,
-                imageHeight = 200.dp,
+                width = 145.dp,
+                imageHeight = 210.dp,
             )
         }
     }
@@ -59,7 +64,7 @@ fun BookList(
 fun BookListPreview() {
     val sampleBooks = listOf(
         com.example.jitbook.book.data.model.Book(
-            id =1,
+            id = "1",
             title = "Avengers - Infinity War",
             imageUrl = "https://image.tmdb.org/t/p/w500/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg",
             authors = listOf("F. Scott Fitzgerald"),
@@ -72,7 +77,7 @@ fun BookListPreview() {
             numEdition = 10
         ),
         com.example.jitbook.book.data.model.Book(
-            id = 2,
+            id = "2",
             title = "Interstellar",
             imageUrl = "https://image.tmdb.org/t/p/w500/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
             authors = listOf("F. Scott Fitzgerald"),
@@ -85,7 +90,7 @@ fun BookListPreview() {
             numEdition = 10
         ),
         com.example.jitbook.book.data.model.Book(
-            id = 3,
+            id = "3",
             title = "The Dark Knight",
             imageUrl = "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
             authors = listOf("F. Scott Fitzgerald"),
@@ -98,7 +103,7 @@ fun BookListPreview() {
             numEdition = 10
         ),
         com.example.jitbook.book.data.model.Book(
-            id = 4,
+            id = "4",
             title = "The Dark Knight",
             imageUrl = "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
             authors = listOf("F. Scott Fitzgerald"),
@@ -111,7 +116,7 @@ fun BookListPreview() {
             numEdition = 10
         ),
         com.example.jitbook.book.data.model.Book(
-            id = 5,
+            id = "5",
             title = "The Dark Knight",
             imageUrl = "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
             authors = listOf("F. Scott Fitzgerald"),
@@ -125,12 +130,18 @@ fun BookListPreview() {
         )
     )
 
-    BookList(
-        books = sampleBooks,
-        onBookClick = { book ->
-            // Handle book click
-        },
-    )
+    JITBookTheme(
+        darkTheme = false,
+        dynamicColor = false,
+    ) {
+        BookList(
+            books = sampleBooks,
+            onBookClick = { book ->
+                // Handle book click
+            },
+        )
+    }
+
 
 }
 

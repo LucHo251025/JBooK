@@ -1,4 +1,4 @@
-package com.example.jitbook.core.data
+    package com.example.jitbook.core.data
 
 import com.example.jitbook.core.domain.DataError
 import com.example.jitbook.core.domain.Result

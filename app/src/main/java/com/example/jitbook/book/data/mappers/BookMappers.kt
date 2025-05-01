@@ -5,12 +5,12 @@ import com.example.jitbook.book.data.model.Book
 
 fun SearchedBookDto.toBook(): Book {
     return Book(
-        id =  id.toInt(),
+        id =  id,
         title = title,
         imageUrl =if(coverKey != null) {
             "https://covers.openlibrary.org/b/olid/${coverKey}-L.jpg"
         }else {
-            "https://covers.openlibrary.org/b/id/${coverAlternateKey}-L.jpg"
+            "https://covers.openlibrary.org/b/id/${coverAlternativeKey}-L.jpg"
         },
         authors = authorNames ?: emptyList(),
         description = null,

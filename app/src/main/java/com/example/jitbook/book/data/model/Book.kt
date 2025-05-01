@@ -1,7 +1,7 @@
 package com.example.jitbook.book.data.model
 
 data class Book(
-    val id: Int,
+    val id: String,
     val title: String,
     val imageUrl: String,
     val authors: List<String>,
