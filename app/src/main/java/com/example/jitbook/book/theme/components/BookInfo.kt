@@ -46,8 +46,10 @@ fun BookInfo(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
+        val roundedAverage = if (averageRating != null) String.format("%.1f", averageRating) else "N/A"
+
         InfoItem(
-            title = averageRating?.toString() ?: "N/A",
+            title = roundedAverage,
             subtitle = ratingsCount?.toString() + " reviews" ?: "N/A",
             icon = Icons.Default.Star,
         )

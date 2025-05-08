@@ -1,5 +1,6 @@
 package com.example.jitbook.book.theme.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -15,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,8 +37,6 @@ fun BookListScreen(
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val searchResultsListState = rememberLazyGridState()
-    val favoriteBooksListState = rememberLazyGridState()
-    val pagerState = rememberPagerState{2}
 
     LaunchedEffect(state.searchResult) {
         searchResultsListState.animateScrollToItem(0)
@@ -67,135 +67,50 @@ fun BookListScreen(
             )
 
 
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
                 ) {
-                    TabRow(
-                        selectedTabIndex = state.selectedTabIndex,
-                        modifier = Modifier
-                            .padding(vertical = 12.dp)
-                            .widthIn(max = 700.dp)
-                            .fillMaxWidth(),
-                        contentColor = MaterialTheme.colorScheme.background,
-                        indicator = {
-                            tabPositions ->
-                            TabRowDefaults.SecondaryIndicator(
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier
-                                    .tabIndicatorOffset(tabPositions[state.selectedTabIndex])
-                            )
-                        }
-                    ) {
-                        Tab(
-                            selected = state.selectedTabIndex == 0,
-                            onClick = {
-                                onAction(BookListAction.OnTabSelected(0))
-                            },
-                            selectedContentColor = MaterialTheme.colorScheme.primary,
-                            unselectedContentColor = Color.Black.copy(alpha = 0.5f),
-                            modifier = Modifier.weight(1f),
-                        ){
-                            Text(
-                                text = stringResource(R.string.search_results),
-                                modifier = Modifier.padding(vertical = 12.dp)
-                            )
-                        }
-                        Tab(
-                            selected = state.selectedTabIndex == 1,
-                            onClick = {
-                                onAction(BookListAction.OnTabSelected(1))
-                            },
-                            selectedContentColor = MaterialTheme.colorScheme.primary,
-                            unselectedContentColor = Color.Black.copy(alpha = 0.5f),
-                            modifier = Modifier.weight(1f),
-                        ){
-                            Text(
-                                text = stringResource(R.string.favorites),
-                                modifier = Modifier.padding(vertical = 12.dp)
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(5.dp))
+                    if (state.isLoading) {
+                        CircularProgressIndicator()
+                    } else {
+                        when {
+                            state.errorMessage != null -> {
+                                Text(
+                                    text = state.errorMessage.asString(),
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
 
-                    HorizontalPager(
-                        state = pagerState,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                    ){
-                        pageIndex ->
+                            state.searchQuery.isEmpty() -> {
+                              Image(
+                                  painter = painterResource(id = R.drawable.search),
+                                  contentDescription = "Search empty",
+                                    modifier = Modifier
+                                        .size(300.dp),
+                              )
+                            }
 
-                        Box(modifier = Modifier
-                            .fillMaxSize(),
-                            contentAlignment = Alignment.Center,
-
-                        ) {
-                            when(pageIndex) {
-                                0 -> {
-                                    if(state.isLoading) {
-                                        CircularProgressIndicator()
-                                    }else {
-                                        when {
-                                            state.errorMessage != null -> {
-                                                Text(
-                                                    text = state.errorMessage.asString(),
-                                                    textAlign = TextAlign.Center,
-                                                    style = MaterialTheme.typography.headlineSmall,
-                                                    color = MaterialTheme.colorScheme.error
-                                                )
-                                            }
-                                            state.searchQuery.isEmpty() -> {
-                                                Text(
-                                                    text = stringResource(R.string.no_search_results),
-                                                    textAlign = TextAlign.Center,
-                                                    style = MaterialTheme.typography.headlineSmall,
-                                                )
-                                            }
-                                            else -> {
-                                                BookList(
-                                                    books = state.searchResult,
-                                                    onBookClick = {
-                                                        onAction(BookListAction.OnBookClick(it))
-                                                    },
-                                                    modifier = Modifier
-                                                        .fillMaxSize(),
-                                                    scrollState = searchResultsListState
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-
-                                1 -> {
-                                    if(state.favoriteBooks.isEmpty()){
-                                        Text(
-                                            text = stringResource(R.string.no_favorite_books),
-                                            textAlign = TextAlign.Center,
-                                            style = MaterialTheme.typography.headlineSmall,
-                                            color = MaterialTheme.colorScheme.error
-                                        )
-                                    }else {
-                                        BookList(
-                                            books = state.favoriteBooks,
-                                            onBookClick = {
-                                                onAction(BookListAction.OnBookClick(it))
-                                            },
-                                            modifier = Modifier
-                                                .fillMaxSize(),
-                                            scrollState = favoriteBooksListState
-                                        )
-                                    }
-                                }
+                            else -> {
+                                BookList(
+                                    books = state.searchResult,
+                                    onBookClick = {
+                                        onAction(BookListAction.OnBookClick(it))
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxSize(),
+                                    scrollState = searchResultsListState
+                                )
                             }
                         }
 
                     }
                 }
-            }
+
 
         }
     }

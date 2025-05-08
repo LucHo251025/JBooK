@@ -29,7 +29,11 @@ import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun BookCarousel(books: List<com.example.jitbook.book.data.model.Book>, modifier: Modifier = Modifier) {
+fun BookCarousel(
+    books: List<Book>,
+    onBookClick: (com.example.jitbook.book.data.model.Book) -> Unit = {},
+    modifier: Modifier = Modifier
+) {
     val pagerState = rememberPagerState()
     val scope = rememberCoroutineScope()
 
@@ -37,9 +41,8 @@ fun BookCarousel(books: List<com.example.jitbook.book.data.model.Book>, modifier
     val screenWidthDp = configuration.screenWidthDp.dp
     val screenHeightDp = configuration.screenHeightDp.dp
 
-    // Tính toán width và imageHeight dựa vào kích thước màn hình
-    val cardWidth = screenWidthDp * 0.6f // Chiếm 60% chiều rộng màn hình
-    val imageHeight = screenHeightDp * 0.35f // Chiếm 35% chiều cao màn hình
+    val cardWidth = screenWidthDp * 0.6f
+    val imageHeight = screenHeightDp * 0.35f
     if (books.isNotEmpty()) {
         LaunchedEffect(Unit) {
             while (true) {
@@ -88,22 +91,10 @@ fun BookCarousel(books: List<com.example.jitbook.book.data.model.Book>, modifier
                     .padding(8.dp)
             ) {
                 BookCard(
-                    com.example.jitbook.book.data.model.Book(
-                        id = "1",
-                        title = books[page].title,
-                        imageUrl = books[page].imageUrl,
-                        authors = listOf("F. Scott Fitzgerald"),
-                        description = "A novel about the American dream and the roaring twenties.",
-                        languages = listOf("English"),
-                        firstPublishYear = "1925",
-                        averageRating = 4.2,
-                        ratingsCount = 34567,
-                        numPages = 180,
-                        numEdition = 10
-                        ),
+                    book = books[page],
                     width = cardWidth,
-                    imageHeight = imageHeight,
-                )
+                    onClick = {onBookClick(books[page])},
+                    imageHeight = imageHeight)
             }
         }
 
@@ -123,7 +114,7 @@ fun BookCarousel(books: List<com.example.jitbook.book.data.model.Book>, modifier
 fun BookCarouselPreview() {
     val sampleBooks = listOf(
         com.example.jitbook.book.data.model.Book(
-            id ="1",
+            id = "1",
             title = "Avengers - Infinity War",
             imageUrl = "https://image.tmdb.org/t/p/w500/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg",
             authors = listOf("F. Scott Fitzgerald"),
@@ -191,5 +182,6 @@ fun BookCarouselPreview() {
 
     BookCarousel(
         sampleBooks,
+        onBookClick = { /* Handle book click */ },
     )
 }

@@ -25,8 +25,8 @@ import com.example.jitbook.book.theme.JITBookTheme
 
 @Composable
 fun BookList(
-    books: List<com.example.jitbook.book.data.model.Book>,
-    onBookClick: (com.example.jitbook.book.data.model.Book) -> Unit,
+    books: List<Book>,
+    onBookClick: (Book) -> Unit,
     modifier: Modifier = Modifier,
     scrollState: LazyGridState = rememberLazyGridState(),
 ) {
@@ -47,10 +47,8 @@ fun BookList(
         ) { book ->
             BookCard(
                 book = book,
-                modifier = modifier
-                    .clickable(
-                        onClick = { onBookClick(book) }
-                    ),
+                modifier = modifier,
+                onClick = {onBookClick(book)},
                 width = 145.dp,
                 imageHeight = 210.dp,
             )

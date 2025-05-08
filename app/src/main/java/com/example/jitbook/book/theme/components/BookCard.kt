@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,6 +36,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -54,7 +56,7 @@ fun BookCard(
 ) {
     Column(
         modifier = modifier
-            .clickable { onClick() },
+            .clickable(onClick = onClick),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -67,67 +69,34 @@ fun BookCard(
             colors = CardDefaults.cardColors(containerColor = Color.Black),
 
             ) {
-            var imageLoadResult by remember {
-                mutableStateOf<Result<Painter>?>(null)
-            }
-
-            val painter = rememberAsyncImagePainter(
-                model = book.imageUrl,
-                onSuccess = {
-                    imageLoadResult = if (it.painter.intrinsicSize.width > 1 && it.painter.intrinsicSize.height > 1) {
-                        Result.success(it.painter) // <- gán vào state
-                    } else {
-                         Result.failure(Exception("Image load failed"))
-                    }
-                },
-                onError = {
-                    it.result.throwable.printStackTrace()
-                    imageLoadResult = Result.failure(it.result.throwable)
-                }
-            )
 
             Box(
                 modifier = Modifier
                     .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                when (val result = imageLoadResult) {
-                    null -> CircularProgressIndicator()
-                    else -> {
-                        Image(
-                            painter = if (result.isSuccess) painter else
-                                painterResource(id = R.drawable.image_break),
-                            contentDescription = book.title,
-                            contentScale = if (result.isSuccess) ContentScale.Crop else ContentScale.Fit,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(imageHeight)
-                                .aspectRatio(
-                                    ratio = 0.65f,
-                                    matchHeightConstraintsFirst = true
-                                )
-                                .clip(RoundedCornerShape(12.dp)),
-                        )
-                    }
-                }
-//                AsyncImage(
-//                    model = book.imageUrl,
-//                    contentDescription = book.title,
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .height(imageHeight)
-//                        .clip(RoundedCornerShape(12.dp)),
-//                    contentScale = ContentScale.Crop,
-//                    placeholder = painterResource(id = R.drawable.image_break),
-//                    error = painterResource(id = R.drawable.image_break)
-//                )
+
+                AsyncImage(
+                    model = book.imageUrl,
+                    contentDescription = book.title,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(imageHeight)
+                        .clip(RoundedCornerShape(12.dp)),
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(id = R.drawable.image_break),
+                    error = painterResource(id = R.drawable.image_break)
+                )
 
             }
 
         }
 
         Column(
-            modifier = Modifier,
+            modifier = Modifier
+                .padding(top = 6.dp)
+                .width(width),
+
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
 
@@ -137,6 +106,8 @@ fun BookCard(
             Text(
                 text = book.title,
                 style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 color = MaterialTheme.colorScheme.onSecondary,
             )
 
@@ -160,6 +131,8 @@ fun BookCard(
                 book.authors.firstOrNull()?.let { authorName ->
                     Text(
                         text = authorName,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                         color = MaterialTheme.colorScheme.onSecondary,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -177,7 +150,7 @@ fun BookCardPreview() {
     BookCard(
         com.example.jitbook.book.data.model.Book(
             id = "1",
-            title = "Book Title Example Example Example",
+            title = "Book Title Example ",
             imageUrl = "https://covers.openlibrary.org/b/id/14826244-L.jpg",
             authors = listOf("F. Scott Fitzgerald"),
             description = "A novel about the American dream and the roaring twenties.",

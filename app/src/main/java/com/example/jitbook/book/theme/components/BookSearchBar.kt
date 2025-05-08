@@ -2,6 +2,8 @@ package com.example.jitbook.book.theme.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,6 +31,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -45,6 +48,13 @@ fun BookSearchBar(
     onImeSearch: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+    val backgroundColor = if (isFocused)
+        Color(0xFFFFF8E1) // Vàng nhạt khi focus
+    else
+        MaterialTheme.colorScheme.surface
+
     CompositionLocalProvider(
         LocalTextSelectionColors provides TextSelectionColors(
             handleColor = MaterialTheme.colorScheme.primary,
@@ -54,10 +64,11 @@ fun BookSearchBar(
         OutlinedTextField(
             value = searchQuery,
             onValueChange = onSearchQueryChange,
-            shape = RoundedCornerShape(100),
+            shape = RoundedCornerShape(20),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 cursorColor = MaterialTheme.colorScheme.onSurface,
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
+                backgroundColor = backgroundColor
             ),
             placeholder = {
                 Text(
@@ -100,9 +111,10 @@ fun BookSearchBar(
             modifier = modifier
                 .background(
                     shape = RoundedCornerShape(100),
-                    color = MaterialTheme.colorScheme.surface,
+                    color = backgroundColor ,
                 )
-                .minimumInteractiveComponentSize()
+                .minimumInteractiveComponentSize(),
+            interactionSource = interactionSource
         )
 
     }

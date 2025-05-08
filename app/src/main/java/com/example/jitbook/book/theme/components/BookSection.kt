@@ -33,7 +33,7 @@ fun BookSection(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 16.dp)
+               .padding(bottom = 16.dp)
     ) {
 
         Row(
@@ -46,7 +46,7 @@ fun BookSection(
             Text(
                 text = title,
                 fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSecondary
             )
 
@@ -62,14 +62,18 @@ fun BookSection(
             contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(books) { book ->
+            items(
+                items = books,
+                key = {it.id}
+            ) { book ->
                 BookCard(
                     book = book,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 16.dp)
                         .weight(1f),
-                    width = 170.dp,
+                    onClick ={ onBookClick(book)},
+                    width = 150.dp,
                     imageHeight = 190.dp,
                 )
             }

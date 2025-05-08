@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Person
@@ -25,38 +26,38 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.jitbook.book.app.Route
 import com.example.jitbook.book.theme.JITBookTheme
 
 
 open class Item(val path: String, val title: String, val icon: ImageVector)
-enum class NavPath {
-    HOME, SEARCH, LIST, PROFILE
-}
+
 
 object NavTitle {
     const val HOME = "Home"
     const val SEARCH = "Search"
-    const val LIST = "List"
+    const val LIST = "Favorite"
     const val PROFILE = "Profile"
 }
 
 sealed class NavItem {
     object Home :
-        Item(path = NavPath.HOME.toString(), title = NavTitle.HOME, icon = Icons.Default.Home)
+        Item(path = Route.BookSubject.route, title = NavTitle.HOME, icon = Icons.Default.Home)
 
     object Search :
-        Item(path = NavPath.SEARCH.toString(), title = NavTitle.SEARCH, icon = Icons.Default.Search)
+        Item(path = Route.BookList.route, title = NavTitle.SEARCH, icon = Icons.Default.Search)
 
     object List :
-        Item(path = NavPath.LIST.toString(), title = NavTitle.LIST, icon = Icons.Default.List)
+        Item(path = Route.BookFavorite.route, title = NavTitle.LIST, icon = Icons.Default.Favorite)
 
     object Profile :
         Item(
-            path = NavPath.PROFILE.toString(), title = NavTitle.PROFILE, icon = Icons.Default.Person
+            path = Route.BookProfile.route, title = NavTitle.PROFILE, icon = Icons.Default.Person
         )
 }
 
@@ -74,7 +75,10 @@ fun BottomNavigationBar(navController: NavController) {
             NavigationBarItem(
                 alwaysShowLabel = true,
                 icon = { Icon(item.icon, contentDescription = item.title) },
-                label = { Text(item.title) },
+                label = { Text(
+                   text =item.title,
+                    fontWeight = FontWeight.Bold,
+                ) },
                 selected = selectedItem == index,
                 onClick = {
                     selectedItem = index
@@ -105,7 +109,7 @@ fun BottomNavigationBar(navController: NavController) {
 @Composable
 fun BottomNavigationBarPreview() {
     JITBookTheme(
-        darkTheme = isSystemInDarkTheme(),
+        darkTheme =true,
         dynamicColor = false
     ) {
         val navController = rememberNavController()

@@ -23,8 +23,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.jitbook.book.theme.JITBookTheme
+import com.example.jitbook.book.theme.viewmodel.AppThemeViewModel
 import okhttp3.OkHttp
+import org.koin.core.context.startKoin
 
 
 class MainActivity : ComponentActivity() {
@@ -33,27 +36,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            JITBookTheme(
-                darkTheme = false,
-                dynamicColor = false
-            ) {
-                val layoutDirection = LocalLayoutDirection.current
-                val windowSize = calculateWindowSizeClass(this)
+            val appThemeViewModel = viewModel<AppThemeViewModel>() // Thêm dòng này
+            App(appThemeViewModel = appThemeViewModel)
 
-                Surface(
-                    modifier = Modifier
-                        .padding(
-                            start = WindowInsets.safeDrawing.asPaddingValues()
-                                .calculateStartPadding(layoutDirection),
-                            end = WindowInsets.safeDrawing.asPaddingValues()
-                                .calculateEndPadding(layoutDirection)
-                        )
-                ) {
-                    App(
-                        engine = remember { io.ktor.client.engine.okhttp.OkHttp.create()}
-                    )
-                }
-            }
         }
     }
 }

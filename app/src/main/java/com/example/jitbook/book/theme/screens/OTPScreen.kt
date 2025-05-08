@@ -40,16 +40,18 @@ import com.example.jitbook.book.theme.components.FallingDots
 import com.example.jitbook.book.theme.components.OtpInputField
 import com.example.jitbook.book.theme.components.PrimaryButton
 import com.example.jitbook.book.theme.components.ResendCodeText
-import com.example.jitbook.book.theme.navigation.BookContentType
+import com.example.jitbook.book.theme.viewmodel.AuthViewModel
 import kotlinx.coroutines.delay
 
 
 @Composable
 fun OTPScreen(
+    viewModel: AuthViewModel,
     modifier: Modifier = Modifier
 ) {
 
     val otpValue = remember { mutableStateOf("") }
+    var secondsLeft by remember { mutableStateOf(60) } // chặn resend trong 30s
 
     Box(
         modifier = modifier
@@ -62,121 +64,104 @@ fun OTPScreen(
                 .zIndex(0f) // nằm sau nội dung
         )
 
-        OTPContent(
-            otpValue = otpValue,
-            modifier = Modifier
+        Column(
+            modifier = modifier
                 .fillMaxSize()
                 .padding(17.dp),
-            contentType = BookContentType.LIST_ONLY
-        )
-
-
-    }
-
-}
-
-
-@Composable
-fun OTPContent(
-    contentType: BookContentType,
-    otpValue: MutableState<String>,
-    modifier: Modifier = Modifier
-) {
-    var secondsLeft by remember { mutableStateOf(60) } // chặn resend trong 30s
-
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(17.dp),
-        verticalArrangement = Arrangement.SpaceBetween
-    ) {
-        Column {
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
             Column {
-                Row(
-                    modifier = Modifier,
-                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                Column {
+                    Row(
+                        modifier = Modifier,
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
 
-                    ) {
-                    Text(
-                        buildAnnotatedString {
-                            append("Forgot Password")
+                        ) {
+                        Text(
+                            buildAnnotatedString {
+                                append("Forgot Password")
 
-                        },
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = MaterialTheme.colorScheme.onSecondary,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
+                            },
+                            style = MaterialTheme.typography.headlineLarge,
+                            color = MaterialTheme.colorScheme.onSecondary,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+
+                            )
+                        Image(
+                            painter = painterResource(id = R.drawable.pin),
+                            contentDescription = "Waving Hand",
+                            modifier = Modifier
+                                .size(60.dp)
 
                         )
-                    Image(
-                        painter = painterResource(id = R.drawable.pin),
-                        contentDescription = "Waving Hand",
+                    }
+                    Spacer(
                         modifier = Modifier
-                            .size(60.dp)
-
+                            .padding(15.dp)
                     )
-                }
-                Spacer(
-                    modifier = Modifier
-                        .padding(15.dp)
-                )
 
-                Text(
-                    text = "We have sent the OTP verification code to your email address. Check your email and enter the code below.",
-                    color = androidx.compose.material3.MaterialTheme.colorScheme.onSecondary,
-                )
+                    Text(
+                        text = "We have sent the OTP verification code to your email address. Check your email and enter the code below.",
+                        color = androidx.compose.material3.MaterialTheme.colorScheme.onSecondary,
+                    )
 
-                Spacer(
-                    modifier = Modifier
-                        .padding(20.dp)
-                )
+                    Spacer(
+                        modifier = Modifier
+                            .padding(20.dp)
+                    )
 
-                OtpInputField(
-                    otp = otpValue,
-                    count = 5,
-                    contentType = contentType
+                    OtpInputField(
+                        otp = otpValue,
+                        count = 5,
+                    )
 
-                )
+                    Spacer(
+                        modifier = Modifier
+                            .padding(20.dp)
+                    )
 
-                Spacer(
-                    modifier = Modifier
-                        .padding(20.dp)
-                )
+                    LaunchedEffect(Unit) {
+                        while (secondsLeft > 0) {
+                            delay(1000)
+                            secondsLeft--
+                        }
+                    }
 
-                LaunchedEffect(Unit) {
-                    while (secondsLeft > 0) {
-                        delay(1000)
-                        secondsLeft--
+                    if (secondsLeft > 0) {
+                        Text(
+                            text = "You can resend in ${secondsLeft}s",
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                        )
+                    } else {
+                        ResendCodeText(
+                            onResendClick = {
+                                secondsLeft = 60
+                            },
+                            isEnabled = true,
+                        )
                     }
                 }
-
-                if (secondsLeft > 0) {
-                    Text(
-                        text = "You can resend in ${secondsLeft}s",
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                    )
-                } else {
-                    ResendCodeText(
-                        onResendClick = {
-                            secondsLeft = 60
-                        },
-                        isEnabled = true,
-                    )
-                }
             }
+
+
+            PrimaryButton(
+                text = "Continue",
+                onClick = { /* Handle button click */ },
+                modifier = Modifier
+                    .padding(top = 40.dp, bottom = 20.dp)
+            )
         }
 
 
-        PrimaryButton(
-            text = "Continue",
-            onClick = { /* Handle button click */ },
-            modifier = Modifier
-                .padding(top = 40.dp, bottom = 20.dp)
-        )
     }
+
 }
+
+
+
 
 
 @Preview(showBackground = true)
@@ -186,7 +171,7 @@ fun OTPScreenPreview() {
         darkTheme = false,
         dynamicColor = false
     ) {
-        OTPScreen()
+//        OTPScreen()
     }
 }
 

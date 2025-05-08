@@ -10,9 +10,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -27,12 +32,21 @@ import com.example.jitbook.book.theme.JITBookTheme
 import com.example.jitbook.book.theme.components.FallingDots
 import com.example.jitbook.book.theme.components.InputDisplay
 import com.example.jitbook.book.theme.components.PrimaryButton
+import com.example.jitbook.book.theme.viewmodel.AuthViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 
 @Composable
 fun ForgotPassWordScreen(
-    modifier: Modifier = Modifier
+    viewModel: AuthViewModel,
+    modifier: Modifier = Modifier,
+    onEmailSent: () -> Unit
+
 ) {
+
+    var email by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
 
     Box(
         modifier = modifier
@@ -46,87 +60,74 @@ fun ForgotPassWordScreen(
                 .zIndex(0f) // nằm sau nội dung
         )
 
-        ForgotPassWordContent(
-            modifier = Modifier
+        Column(
+            modifier = modifier
                 .fillMaxSize()
-                .padding(17.dp)
-                .zIndex(1f), // nằm trên FallingDots
-            onBackClick = { /* Handle back click */ },
-            onSendClick = { /* Handle send click */ }
-        )
+                .padding(17.dp),
+            verticalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween
 
+        ) {
+            Column {
+                Row(
+                    modifier = Modifier,
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
 
-    }
-}
+                    ) {
+                    Text(
+                        buildAnnotatedString {
+                            append("Forgot Password")
 
-@Composable
-fun ForgotPassWordContent(
-    modifier: Modifier = Modifier,
-    onBackClick: () -> Unit = {},
-    onSendClick: () -> Unit = {},
-) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(17.dp),
-        verticalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween
+                        },
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = MaterialTheme.colorScheme.onSecondary,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
 
-    ) {
-        Column {
-            Row(
-                modifier = Modifier,
-                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
-
-                ) {
-                Text(
-                    buildAnnotatedString {
-                        append("Forgot Password")
-
-                    },
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = MaterialTheme.colorScheme.onSecondary,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-
+                        )
+                    Image(
+                        painter = painterResource(id = R.drawable.icons8_key_188),
+                        contentDescription = "Waving Hand"
                     )
-                Image(
-                    painter = painterResource(id = R.drawable.icons8_key_188),
-                    contentDescription = "Waving Hand"
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+                Text(
+                    text = "Enter your email address. We will send an OTP code for verification in the next step.",
+                    color = MaterialTheme.colorScheme.onSecondary,
                 )
+                Spacer(modifier = Modifier.height(20.dp))
+                InputDisplay(
+                    value = email,
+                    onValueChange = {
+                        email = it
+                    },
+                    label = "Email",
+                    modifier = Modifier
+
+                )
+
+                if (errorMessage.isNotEmpty()) {
+                    Text(
+                        text = errorMessage,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
             }
-            Spacer(modifier = Modifier.height(20.dp))
-            Text(
-                text = "Enter your email address. We will send an OTP code for verification in the next step.",
-                color = MaterialTheme.colorScheme.onSecondary,
-            )
-            Spacer(modifier = Modifier.height(20.dp))
-            InputDisplay(
-                value = "",
-                onValueChange = {},
-                label = "Email",
-                modifier = Modifier
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }else {
+                PrimaryButton(
+                    text = "Continue",
+                    onClick = {
+                        viewModel.sendPasswordReset(email)
+                    },
+                )
 
-            )
+            }
         }
-
-        PrimaryButton(
-            text = "Continue",
-            onClick = { /* Handle button click */ },
-            modifier = Modifier
-                .padding(top = 40.dp, bottom = 20.dp)
-        )
     }
-}
 
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-    JITBookTheme(
-        darkTheme = false,
-        dynamicColor = false
-    ) {
-        ForgotPassWordScreen(
-        )
-    }
 }

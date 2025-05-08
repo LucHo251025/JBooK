@@ -47,7 +47,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.jitbook.book.theme.JITBookTheme
-import com.example.jitbook.book.theme.navigation.BookContentType
 import kotlinx.coroutines.launch
 
 
@@ -61,7 +60,6 @@ private data class OtpField(
 
 @Composable
 fun OtpInputField(
-    contentType: BookContentType,
     otp: MutableState<String>,
     count: Int = 5,
     otpBoxModifier: Modifier = Modifier
@@ -113,7 +111,6 @@ fun OtpInputField(
     ) {
         repeat(count) { index ->
             OtpBox(
-                contentType = contentType,
                 modifier = otpBoxModifier,
                 otpValue = otpFieldsValue[index].value,
                 textType = otpTextType,
@@ -132,7 +129,6 @@ fun OtpInputField(
                         otpFieldsValue[index].value.copy(focusRequester = focusRequester)
                 },
                 onNext = {
-                    // Attempt to move focus to the next box when the "next" action is triggered.
                     focusNextBox(index, count, otpFieldsValue)
                 },
             )
@@ -142,7 +138,6 @@ fun OtpInputField(
 
 @Composable
 private fun OtpBox(
-    contentType: BookContentType,
     modifier: Modifier,
     otpValue: OtpField,
     textType: KeyboardType = KeyboardType.Number,
@@ -159,15 +154,7 @@ private fun OtpBox(
 
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp.dpToPx().toInt()
     val paddingValue = 5
-    val totalBoxSize = when (contentType) {
-            BookContentType.LIST_ONLY -> {
-            (screenWidth / totalBoxCount) - (paddingValue * totalBoxCount) - 30
-        }
-
-        else -> {
-            (screenWidth / totalBoxCount) - (paddingValue * totalBoxCount) -250
-        }
-    }
+    val totalBoxSize = (screenWidth / totalBoxCount) - (paddingValue * totalBoxCount) - 30
     val isFocused = otpValue.text.isNotEmpty() // bạn có thể dùng `isFocused` khác nếu có
 
     // Tuỳ chỉnh màu viền và nền
@@ -310,7 +297,6 @@ fun OtpView_Preivew() {
                         color = MaterialTheme.colorScheme.primaryContainer,
                     ),
                 textColor = Color.Black,
-                contentType = BookContentType.LIST_AND_DETAIL
             )
         }
 

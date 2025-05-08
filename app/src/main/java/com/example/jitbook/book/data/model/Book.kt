@@ -6,6 +6,7 @@ data class Book(
     val imageUrl: String,
     val authors: List<String>,
     val description: String?,
+    val readableUrl: String? = null,
     val languages: List<String>,
     val firstPublishYear: String?,
     val averageRating: Double?,

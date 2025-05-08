@@ -13,6 +13,8 @@ material3WindowSizeClassAndroid = "1.3.2"
 googleGmsGoogleServices = "4.4.2"
 firebaseDatabase = "21.0.0"
 firebaseCrashlyticsBuildtools = "3.0.3"
+roomRuntimeAndroid = "2.7.1"
+runtimeLivedata = "1.8.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -33,6 +35,8 @@ androidx-core-i18n = { group = "androidx.core", name = "core-i18n", version.ref 
 material3-window-size = { group = "androidx.compose.material3", name = "material3-window-size-class-android", version.ref = "material3WindowSizeClassAndroid" }
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "firebase-crashlytics-buildtools", version.ref = "firebaseCrashlyticsBuildtools" }
+androidx-room-runtime-android = { group = "androidx.room", name = "room-runtime-android", version.ref = "roomRuntimeAndroid" }
+androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
