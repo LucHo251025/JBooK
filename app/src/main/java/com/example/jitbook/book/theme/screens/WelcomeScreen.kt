@@ -36,6 +36,7 @@ import com.example.jitbook.book.theme.components.SocialGoogleButton
 
 @Composable
 fun WelcomeScreen(
+    onLoginGoogleButtonClicked: () -> Unit,
     onLoginButtonClicked: () -> Unit,
     onSignUpButtonClicked: () -> Unit,
     modifier: Modifier = Modifier
@@ -56,6 +57,7 @@ fun WelcomeScreen(
         WelcomeContent(
             onLoginButtonClicked = onLoginButtonClicked,
             onSignUpButtonClicked = onSignUpButtonClicked,
+            onLoginGoogleButtonClicked =  onLoginGoogleButtonClicked,
             modifier = Modifier
                 .fillMaxSize()
         )
@@ -68,6 +70,7 @@ fun WelcomeScreen(
 
 @Composable
 fun WelcomeContent(
+    onLoginGoogleButtonClicked: () -> Unit,
     onLoginButtonClicked: () -> Unit,
     onSignUpButtonClicked: () -> Unit,
     modifier: Modifier = Modifier
@@ -152,14 +155,14 @@ fun WelcomeContent(
             SocialGoogleButton(
                 servicesName = "Continue with Google",
                 servicesIcon = painterResource(id = R.drawable.google),
-                onClick = { /*TODO*/ },
+                onClick = { onLoginGoogleButtonClicked() },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
 
             PrimaryButton(
                 text = "Get Started",
-                onClick = { /*TODO*/ },
+                onClick = { onSignUpButtonClicked() },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -184,7 +187,8 @@ fun WelcomeScreenPreview() {
     ) {
         WelcomeScreen(
             onLoginButtonClicked = {},
-            onSignUpButtonClicked = {}
+            onSignUpButtonClicked = {},
+            onLoginGoogleButtonClicked = {},
         )
     }
 }

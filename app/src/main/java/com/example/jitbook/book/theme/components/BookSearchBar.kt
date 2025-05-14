@@ -66,20 +66,21 @@ fun BookSearchBar(
             onValueChange = onSearchQueryChange,
             shape = RoundedCornerShape(20),
             colors = TextFieldDefaults.outlinedTextFieldColors(
-                cursorColor = MaterialTheme.colorScheme.onSurface,
+                cursorColor = MaterialTheme.colorScheme.onSecondary,
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
                 backgroundColor = backgroundColor
             ),
             placeholder = {
                 Text(
                     text = stringResource(id = R.string.search_hint),
+                    color = MaterialTheme.colorScheme.onSecondary
                 )
             },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Search,
                     contentDescription = stringResource(id = R.string.search_hint),
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.66f)
+                    tint = MaterialTheme.colorScheme.primary
                 )
             },
             singleLine = true,

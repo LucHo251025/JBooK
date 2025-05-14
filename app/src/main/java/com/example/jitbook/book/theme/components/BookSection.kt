@@ -27,7 +27,7 @@ import com.example.jitbook.book.theme.JITBookTheme
 fun BookSection(
     title: String,
     books: List<com.example.jitbook.book.data.model.Book>,
-    onAllClick: () -> Unit = {},
+    onAllClick: (String) -> Unit = {},
     onBookClick: (com.example.jitbook.book.data.model.Book) -> Unit = {},
 ) {
     Column(
@@ -50,7 +50,7 @@ fun BookSection(
                 color = MaterialTheme.colorScheme.onSecondary
             )
 
-            IconButton(onClick = onAllClick) {
+            IconButton(onClick ={ onAllClick(title)}) {
                 Icon(
                     imageVector = Icons.Default.ArrowForward,
                     contentDescription = null,
@@ -66,7 +66,7 @@ fun BookSection(
                 items = books,
                 key = {it.id}
             ) { book ->
-                BookCard(
+                BookCardNew(
                     book = book,
                     modifier = Modifier
                         .fillMaxWidth()

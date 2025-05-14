@@ -46,7 +46,9 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun OTPScreen(
+    mail: String,
     viewModel: AuthViewModel,
+    onVerifyClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -149,7 +151,9 @@ fun OTPScreen(
 
             PrimaryButton(
                 text = "Continue",
-                onClick = { /* Handle button click */ },
+                onClick = {
+
+                },
                 modifier = Modifier
                     .padding(top = 40.dp, bottom = 20.dp)
             )

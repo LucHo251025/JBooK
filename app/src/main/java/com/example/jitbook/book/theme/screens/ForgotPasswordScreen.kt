@@ -14,7 +14,9 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.jitbook.R
+import com.example.jitbook.book.theme.AuthState
 import com.example.jitbook.book.theme.JITBookTheme
 import com.example.jitbook.book.theme.components.FallingDots
 import com.example.jitbook.book.theme.components.InputDisplay
@@ -40,7 +43,7 @@ import com.google.firebase.auth.FirebaseAuth
 fun ForgotPassWordScreen(
     viewModel: AuthViewModel,
     modifier: Modifier = Modifier,
-    onEmailSent: () -> Unit
+    onEmailSent: (String) -> Unit
 
 ) {
 
@@ -48,6 +51,25 @@ fun ForgotPassWordScreen(
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
+    val authState by viewModel.authState.observeAsState()
+
+
+    LaunchedEffect(authState) {
+        when (authState) {
+            is AuthState.PasswordResetEmailSent -> {
+                // Handle success, for example, navigate or show a success message
+                onEmailSent((authState as AuthState.PasswordResetEmailSent).email)
+            }
+            is AuthState.Error -> {
+                // Show error message
+                errorMessage = (authState as AuthState.Error).message
+            }
+            else -> {
+                // Handle other states like Loading or Authenticated
+                errorMessage = ""
+            }
+        }
+    }
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -67,7 +89,9 @@ fun ForgotPassWordScreen(
             verticalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween
 
         ) {
-            Column {
+            Column(
+                verticalArrangement = Arrangement.Center,
+            ) {
                 Row(
                     modifier = Modifier,
                     verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
@@ -123,7 +147,7 @@ fun ForgotPassWordScreen(
                     text = "Continue",
                     onClick = {
                         viewModel.sendPasswordReset(email)
-                    },
+                    }
                 )
 
             }

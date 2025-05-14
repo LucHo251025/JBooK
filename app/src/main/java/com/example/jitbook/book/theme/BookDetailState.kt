@@ -8,5 +8,7 @@ data class BookDetailState (
     val isLoading: Boolean = false,
     val isFavorite: Boolean = false,
     val book: Book? = null,
-    val ratings: List<Rating> = emptyList()
+    val ratings: List<Rating> = emptyList(),
+    val averageRating: Double = 0.0,
+    val numReviews: Int = 0
 )

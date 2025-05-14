@@ -19,7 +19,10 @@ import androidx.compose.ui.zIndex
 import com.example.jitbook.book.data.model.Book
 import com.example.jitbook.book.theme.components.BookList
 import com.example.jitbook.book.theme.components.FallingDots
+import com.example.jitbook.book.theme.components.LoadingSpinner
 import com.example.jitbook.book.theme.viewmodel.FavoriteViewModel
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @Composable
 fun FavoriteBooksScreen(
@@ -28,47 +31,55 @@ fun FavoriteBooksScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
-        contentAlignment = Alignment.Center
+    val isRefreshing = uiState.isLoading
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
+
+    SwipeRefresh(
+        state = swipeRefreshState,
+        onRefresh = { viewModel.fetchFavoriteBooks() }, // Gọi lại hàm load dữ liệu
+        modifier = modifier.fillMaxSize()
     ) {
-        FallingDots(
-            modifier = Modifier
+        Box(
+            modifier = modifier
                 .fillMaxSize()
-                .zIndex(0f) // nằm sau nội dung
-        )
-        when{
-            uiState.isLoading -> {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.primary,
-                    strokeWidth = 4.dp,
-                    modifier = Modifier.size(32.dp)
-                )
-            }
+                .background(MaterialTheme.colorScheme.background),
+            contentAlignment = Alignment.Center
+        ) {
+            FallingDots(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .zIndex(0f) // nằm sau nội dung
+            )
+            when {
+                uiState.isLoading -> {
+                    LoadingSpinner(
+                        modifier = Modifier
+                            .size(80.dp)
+                    )
+                }
 
-            uiState.error != null -> {
-                Text(
-                    text = uiState.error ?: "Unknown error",
-                    color = Color.Red,
-                )
+                uiState.error != null -> {
+                    Text(
+                        text = uiState.error ?: "Unknown error",
+                        color = Color.Red,
+                    )
 
-            }
+                }
 
-            uiState.favoriteBooks.isEmpty() -> {
+                uiState.favoriteBooks.isEmpty() -> {
                     Text(text = "No favorite books found")
+                }
+
+                else -> {
+                    BookList(
+                        uiState.favoriteBooks,
+                        onBookClick = onBookClick,
+                        modifier = Modifier
+                            .zIndex(1f) // nằm trên FallingDots
+                    )
+                }
             }
-            else -> {
-                BookList(
-                    uiState.favoriteBooks,
-                    onBookClick = onBookClick,
-                    modifier = Modifier
-                        .zIndex(1f) // nằm trên FallingDots
-                )
-            }
+
         }
-
     }
-
 }

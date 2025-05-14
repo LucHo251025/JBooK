@@ -26,18 +26,26 @@ class FavoriteViewModel(
         fetchFavoriteBooks()
     }
 
+
     fun fetchFavoriteBooks() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: run {
             _uiState.value = _uiState.value.copy(error = "User not logged in")
             return
         }
+        Log.d("FAV_DEBUG", "Current User UID: $userId")
 
-        db.collection("users").document(userId)
+        db.collection("favorites")
+            .whereEqualTo("userId", userId)
             .get()
-            .addOnSuccessListener { document ->
-                val favorites = document.get("favorites") as? List<String> ?: emptyList()
-                _uiState.value = _uiState.value.copy(favoriteBookIds = favorites)
-                if (favorites.isNotEmpty()) fetchBookDetails(favorites)
+            .addOnSuccessListener { result ->
+                val favoriteIds = result.documents.mapNotNull { it.getString("bookId") }
+                _uiState.value = _uiState.value.copy(favoriteBookIds = favoriteIds)
+
+                if (favoriteIds.isNotEmpty()) {
+                    fetchBookDetails(favoriteIds)
+                } else {
+                    _uiState.value = _uiState.value.copy(favoriteBooks = emptyList())
+                }
             }
             .addOnFailureListener {
                 _uiState.value = _uiState.value.copy(error = "Failed to fetch favorites: ${it.message}")
@@ -50,7 +58,6 @@ class FavoriteViewModel(
 
             bookRepository.getFavoriteBooks(ids)
                 .onSuccess { books ->
-
 
                     _uiState.value = _uiState.value.copy(
                         favoriteBooks = books,

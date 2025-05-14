@@ -34,14 +34,15 @@ class BookDetailViewModel(
         .get<String>("bookId")
         ?: throw IllegalArgumentException("Missing argument 'bookId'")
 
-    // 2. Loại bỏ prefixx "/works/" và suffix ".json"
-    private val bookId: String = rawBookId
+     val bookId: String = rawBookId
         .removePrefix("/works/")
         .removeSuffix(".json")
 
     init {
-        checkIfBookIsFavorite()
-        fetchRatings()
+        viewModelScope.launch {
+            launch { checkIfBookIsFavorite() }
+            launch { fetchRatings(bookId) }
+        }
     }
 
     fun onAction(action: BookDetailAction) {
@@ -88,12 +89,14 @@ class BookDetailViewModel(
     private fun checkIfBookIsFavorite() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val db = FirebaseFirestore.getInstance()
-        val userRef = db.collection("users").document(userId)
-        userRef.get().addOnSuccessListener { document ->
-            val favorites = document.get("favorites") as? List<String> ?: emptyList()
-            val isFav = favorites.contains(bookId)
-            _state.update { it.copy(isFavorite = isFav) }
-        }
+        val docId = "${userId}_$bookId"
+
+        db.collection("favorites").document(docId)
+            .get()
+            .addOnSuccessListener { document ->
+                val isFav = document.exists()
+                _state.update { it.copy(isFavorite = isFav) }
+            }
     }
 
     fun toggleFavorite() {
@@ -109,94 +112,108 @@ class BookDetailViewModel(
     fun addBookToFavorites(bookId: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val db = FirebaseFirestore.getInstance()
-        val userRef = db.collection("users").document(userId)
-        userRef.update("favorites", FieldValue.arrayUnion(bookId))
+        val docId = "${userId}_$bookId"
+
+        val data = hashMapOf(
+            "userId" to userId,
+            "bookId" to bookId,
+            "timestamp" to Timestamp.now()
+        )
+
+        db.collection("favorites").document(docId)
+            .set(data)
             .addOnSuccessListener {
                 checkIfBookIsFavorite()
             }
-            .addOnFailureListener { /* Nếu chưa có field favorites, tạo mới */
-                userRef.set(mapOf("favorites" to listOf(bookId)))
-                    .addOnSuccessListener {
-                        checkIfBookIsFavorite()
-                    }
+            .addOnFailureListener { e ->
+                Log.e("BookDetailViewModel", "Failed to add to favorites", e)
             }
     }
 
     fun removeBookFromFavorites(bookId: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val db = FirebaseFirestore.getInstance()
-        val userRef = db.collection("users").document(userId)
-        userRef.update("favorites", FieldValue.arrayRemove(bookId))
-            .addOnSuccessListener {
+
+        db.collection("favorites")
+            .whereEqualTo("userId", userId)
+            .whereEqualTo("bookId", bookId)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                for (document in querySnapshot.documents) {
+                    db.collection("favorites").document(document.id).delete()
+                }
                 checkIfBookIsFavorite()
+            }
+            .addOnFailureListener {
+                Log.e("REMOVE_FAV", "Failed to remove: ${it.message}")
             }
     }
 
 
-
     private fun fetchBookReadableLink() {
         viewModelScope.launch {
-            val result = bookRepository.getReadableLink(bookId)
-            Log.d("DEBUG", "readableLink result: $result")
-
+            _state.update { it.copy(isLoading = true) }
             bookRepository.getReadableLink(bookId)
                 .onSuccess { readableUrl ->
                     Log.d("DEBUG", "readableUrl = $readableUrl")
 
-                    _state.update { it.copy(book = it.book?.copy(readableUrl = readableUrl)) }
+                    _state.update {
+                        it.copy(book = it.book?.copy(readableUrl = readableUrl), isLoading = false)
+                    }
                 }
-
         }
     }
+
     fun submitRating(rating: Int, comment: String) {
         val user = FirebaseAuth.getInstance().currentUser ?: return
         val db = FirebaseFirestore.getInstance()
 
         val defaultImageUrl = "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-        val imageUrl = user.photoUrl?.toString() ?: defaultImageUrl
         val userId = user.uid
         val userName = user.displayName ?: "Anonymous"
 
-        val ratingData = hashMapOf(
-            "userId" to userId,
+        val reviewData = hashMapOf(
+            "book_id" to bookId,
+            "user_id" to userId,
             "userName" to userName,
-            "imageUrl" to imageUrl,
-            "rating" to rating,
-            "comment" to comment,
+            "imageUrl" to defaultImageUrl,
+            "content" to comment,
+            "score" to rating,
             "timestamp" to FieldValue.serverTimestamp()
         )
 
-        db.collection("books")
-            .document(bookId)
-            .collection("ratings")
-            .document(userId)
-            .set(ratingData)
+        db.collection("reviews")
+            .add(reviewData)
             .addOnSuccessListener {
-                Log.d("BookDetailViewModel", "Rating submitted successfully.")
-                fetchRatings()
+                Log.d("BookDetailViewModel", "Review submitted successfully.")
+                fetchRatings(bookId)
             }
             .addOnFailureListener { e ->
-                Log.e("BookDetailViewModel", "Failed to submit rating", e)
+                Log.e("BookDetailViewModel", "Failed to submit review", e)
             }
     }
 
 
-    fun fetchRatings() {
+    fun fetchRatings(bookId: String) {
         val db = FirebaseFirestore.getInstance()
-        db.collection("books")
-            .document(bookId)
-            .collection("ratings")
+        db.collection("reviews")
+            .whereEqualTo("book_id", bookId)
             .get()
             .addOnSuccessListener { result ->
+                Log.d("DEBUG", "Found ${result.size()} reviews for bookId = $bookId")
+
                 val ratingList = result.documents.mapNotNull { doc ->
-                    val userId = doc.getString("userId") ?: return@mapNotNull null
-                    val rating = doc.getDouble("rating")?.toInt() ?: 0
-                    val comment = doc.getString("comment") ?: ""
-                    val imageUrl = doc.getString("imageUrl") ?: ""
+                    val reviewId = doc.id
+                    val userId = doc.getString("user_id") ?: return@mapNotNull null
+                    val rating = doc.getLong("score")?.toInt() ?: 0
+                    val comment = doc.getString("content") ?: ""
                     val timestamp = doc.getTimestamp("timestamp")?.toDate()?.time ?: 0L
                     val sqlTimestamp = java.sql.Timestamp(timestamp)
+                    val imageUrl = doc.getString("imageUrl") ?: ""
                     val userName = doc.getString("userName") ?: "Anonymous"
+
                     Rating(
+                        reviewId = reviewId,
                         userId = userId,
                         rating = rating,
                         imageUrl = imageUrl,
@@ -206,13 +223,77 @@ class BookDetailViewModel(
                     )
                 }
 
-                _state.update {
-                    it.copy(ratings = ratingList)
+                val count = ratingList.size
+                val averageRatingNew = ratingList.mapNotNull { it.rating }.average()
+                val oldAverage = _state.value.book?.averageRating
+                val oldCount = _state.value.book?.ratingsCount
+
+
+                if (oldAverage != null && oldCount != null && count > 0) {
+                    val newAverage =
+                        (oldAverage * oldCount + averageRatingNew * count) / (oldCount + count)
+                    val newCount = oldCount + count
+                    _state.update {
+                        it.copy(
+                            ratings = ratingList,
+                            averageRating = newAverage,
+                            numReviews = newCount
+                        )
+                    }
+                } else {
+                    // Trường hợp lần đầu có đánh giá
+                    _state.update {
+                        it.copy(
+                            ratings = ratingList,
+                            averageRating = averageRatingNew,
+                            numReviews = oldCount ?: 0 + count
+                        )
+                    }
                 }
             }
             .addOnFailureListener { e ->
                 Log.e("BookDetailViewModel", "Failed to fetch ratings", e)
             }
     }
+    fun updateRating(
+        reviewId: String,
+        newRating: Int?,
+        newComment: String?
+    ) {
+        if (reviewId.isBlank()) return
+
+        val db = FirebaseFirestore.getInstance()
+
+        val updatedFields = mutableMapOf<String, Any?>()
+        newRating?.let { updatedFields["score"] = it }
+        newComment?.let { updatedFields["content"] = it }
+        updatedFields["timestamp"] = FieldValue.serverTimestamp()
+
+        db.collection("reviews").document(reviewId)
+            .update(updatedFields)
+            .addOnSuccessListener {
+                Log.d("BookDetailViewModel", "Rating updated successfully.")
+                fetchRatings(bookId) // refresh ratings UI
+            }
+            .addOnFailureListener { e ->
+                Log.e("BookDetailViewModel", "Failed to update rating", e)
+            }
+    }
+
+
+    fun deleteRatingById(reviewId: String) {
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("reviews").document(reviewId)
+            .delete()
+            .addOnSuccessListener {
+                Log.d("BookDetailViewModel", "Rating with ID $reviewId deleted successfully.")
+                fetchRatings(bookId) // Cập nhật lại danh sách đánh giá
+            }
+            .addOnFailureListener { e ->
+                Log.e("BookDetailViewModel", "Failed to delete rating with ID $reviewId", e)
+            }
+    }
+
 
 }

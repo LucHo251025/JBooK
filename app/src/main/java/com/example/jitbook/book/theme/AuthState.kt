@@ -8,5 +8,4 @@ sealed class AuthState {
     data class PasswordResetEmailSent(val email: String) : AuthState()
     object PasswordResetSuccess : AuthState()
     data class Success(val message: String) : AuthState()
-
 }

@@ -6,7 +6,7 @@ plugins {
     id("kotlin-kapt")
     alias(libs.plugins.google.gms.google.services) // Plugin KAPT
     kotlin("plugin.serialization") version "1.9.20"
-
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -49,16 +49,15 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
 
-    // Coil (Hiển thị ảnh bìa sách)
+    // Coil
     implementation("io.coil-kt:coil-compose:2.4.0")
 
     // ViewModel + StateFlow
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
 
-    // Hilt (Dependency Injection - DI)
+    // Hilt (DI)
     implementation("com.google.dagger:hilt-android:2.50")
-    implementation(libs.androidx.runtime.livedata)
     kapt("com.google.dagger:hilt-compiler:2.50")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
 
@@ -75,9 +74,10 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.3.0")
     implementation("androidx.compose.material3:material3:1.2.1")
 
-    // Accompanist Pager
+    // Accompanist
     implementation("com.google.accompanist:accompanist-pager:0.34.0")
     implementation("com.google.accompanist:accompanist-pager-indicators:0.34.0")
+    implementation("com.google.accompanist:accompanist-swiperefresh:0.33.2-alpha")
 
     // Ktor
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
@@ -88,14 +88,21 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
     implementation("io.ktor:ktor-client-logging:2.3.7")
 
-    // Koin DI (nếu dùng song song với Hilt)
+    // Koin (nếu dùng song song với Hilt - cẩn thận tránh xung đột)
     implementation("io.insert-koin:koin-androidx-compose:3.5.3")
 
-    // ✅ Firebase (DÙNG BOM — KHÔNG ghi version thủ công)
+    // ✅ Firebase - dùng BoM để đồng bộ version
     implementation(platform("com.google.firebase:firebase-bom:32.7.3"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.firebase:firebase-database")
+    implementation("com.google.firebase:firebase-crashlytics-ktx")
+    implementation("com.google.firebase:firebase-functions-ktx")
+
+    implementation("androidx.compose.runtime:runtime-livedata")
+
+    // Google Auth
+    implementation("com.google.android.gms:play-services-auth:20.0.1")
 
     // Jetpack & Compose Libs (nếu dùng alias thì giữ nguyên)
     implementation(libs.material3.window.size)

@@ -64,6 +64,7 @@ fun BookAlert(
     title: String,
     message: String,
     isLoading: Boolean = false,
+    color: Color,
     onDismiss: () -> Unit
 ) {
     Dialog(onDismissRequest = onDismiss) {
@@ -74,20 +75,17 @@ fun BookAlert(
             shape = RoundedCornerShape(20.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         ) {
-            // Dùng Box để chồng layer: hiệu ứng dưới, nội dung trên
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
             ) {
-                // 🎉 Hiệu ứng chấm rơi phủ toàn bộ card
                 FallingDots(
                     modifier = Modifier
                         .fillMaxSize()
                         .zIndex(0f) // nằm sau nội dung
                 )
 
-                // Nội dung hiển thị
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -96,11 +94,10 @@ fun BookAlert(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    // Icon với nền tròn
                     Box(
                         modifier = Modifier
                             .size(100.dp)
-                            .background(MaterialTheme.colorScheme.primary, shape = CircleShape),
+                            .background(color, shape = CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -133,10 +130,8 @@ fun BookAlert(
 
                     if (isLoading) {
                         Spacer(modifier = Modifier.height(24.dp))
-                        CircularProgressIndicator(
-                            color = MaterialTheme.colorScheme.primary,
-                            strokeWidth = 4.dp,
-                            modifier = Modifier.size(32.dp)
+                        LoadingSpinner(
+                            modifier = Modifier.size(80.dp),
                         )
                     }
                 }
@@ -229,7 +224,8 @@ fun BookAlertPreview() {
             title = "Success!",
             message = "Your operation completed successfully.",
             isLoading = true,
-            onDismiss = { /* close dialog */ }
+            onDismiss = { /* close dialog */ },
+            color = MaterialTheme.colorScheme.primary
         )
     }
 

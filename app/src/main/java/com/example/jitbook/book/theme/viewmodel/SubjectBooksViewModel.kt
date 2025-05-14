@@ -20,10 +20,20 @@ class SubjectBooksViewModel(
     val uiState: StateFlow<SubjectBooksUiState> = _uiState
     var fantasyBooks: List<Book>? = null
 
-    private val subjects = listOf("romance", "fantasy", "history", "science_fiction")
+    private val subjects = listOf("kids","romance", "fantasy", "history", "science_fiction","love")
+    private val _selectedSubject = MutableStateFlow<String?>(null)
+    val selectedSubject: StateFlow<String?> = _selectedSubject
 
     init {
         loadBooksBySubjects()
+    }
+
+    fun onSubjectSelected(subject: String) {
+        _selectedSubject.value = subject
+    }
+
+    fun clearSelectedSubject() {
+        _selectedSubject.value = null
     }
 
     private fun loadBooksBySubjects() {

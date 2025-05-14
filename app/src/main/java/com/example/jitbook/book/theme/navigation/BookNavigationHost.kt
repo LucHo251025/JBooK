@@ -1,14 +1,23 @@
 package com.example.jitbook.book.theme.navigation
 
 import android.net.Uri
+import android.provider.Settings.Global.getString
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
@@ -19,19 +28,23 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
+import com.example.jitbook.R
 import com.example.jitbook.book.app.Route
-import com.example.jitbook.book.data.dto.SubjectBookDto
 import com.example.jitbook.book.theme.BookDetailAction
 import com.example.jitbook.book.theme.components.BookTopBar
 import com.example.jitbook.book.theme.components.BottomNavigationBar
-import com.example.jitbook.book.theme.screens.BookDetailScreen
+import com.example.jitbook.book.theme.components.FallingDots
 import com.example.jitbook.book.theme.screens.BookDetailScreenRoot
 import com.example.jitbook.book.theme.screens.FavoriteBooksScreen
+import com.example.jitbook.book.theme.screens.ForgotPassWordScreen
 import com.example.jitbook.book.theme.screens.HomePageScreen
 import com.example.jitbook.book.theme.screens.LoginScreen
+import com.example.jitbook.book.theme.screens.NewPassScreen
+import com.example.jitbook.book.theme.screens.OTPScreen
 import com.example.jitbook.book.theme.screens.SignUpScreen
 import com.example.jitbook.book.theme.screens.SplashScreen
 import com.example.jitbook.book.theme.screens.SubjectScreen
+import com.example.jitbook.book.theme.screens.WelcomeScreen
 import com.example.jitbook.book.theme.viewmodel.AppThemeViewModel
 import com.example.jitbook.book.theme.viewmodel.AuthViewModel
 import com.example.jitbook.book.theme.viewmodel.BookDetailViewModel
@@ -40,6 +53,9 @@ import com.example.jitbook.book.theme.viewmodel.FavoriteViewModel
 import com.example.jitbook.book.theme.viewmodel.SelectedBookViewModel
 import com.example.jitbook.book.theme.viewmodel.SubjectBooksViewModel
 import com.example.jitbook.screen.ProfileScreen
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -47,7 +63,6 @@ fun BookNavigationHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
     appThemeViewModel: AppThemeViewModel
-
 ) {
     val bottomBarRoutes = listOf(
         Route.BookList.route,
@@ -57,17 +72,17 @@ fun BookNavigationHost(
         Route.BookProfile.route,
     )
 
+    val subjectViewModel = koinViewModel<SubjectBooksViewModel>()
     val currentDestination by navController.currentBackStackEntryAsState()
     Scaffold(
         topBar = {
             BookTopBar(
+                viewModel = subjectViewModel,
                 currentRoute = currentDestination?.destination?.route,
                 onBackClick = { navController.navigateUp() },
-                onSettingsClick = { /* TODO */ },
-                onSearchClick = { /* TODO */ },
-                onNotificationClick = {
-                    navController.navigate(Route.BookSubject.route) // ví dụ chuyển đến màn hình Notification
-                }
+                modifier = Modifier
+                    .zIndex(1f)
+
             )
         },
         bottomBar = {
@@ -75,25 +90,90 @@ fun BookNavigationHost(
                 BottomNavigationBar(navController = navController)
             }
         }
-    ) {
-        innerPadding ->
+    ) { innerPadding ->
+
         NavHost(
             navController = navController,
             startDestination = Route.BookGraph.route,
             modifier = Modifier
                 .padding(innerPadding)
 
-            ) {
+        ) {
             navigation(
-                startDestination = Route.BookSplash.route,
+                startDestination = Route.BookWelcome.route,
                 route = Route.BookGraph.route
             ) {
+                composable(Route.BookResetPassword.route){
+                    val viewModel = koinViewModel<AuthViewModel>()
+                    ForgotPassWordScreen(
+                        viewModel = viewModel,
+                        onEmailSent = {
+                            navController.navigate(Route.BookLogin.route)
+                        },
+                        modifier = modifier
+                    )
+                }
+                composable(Route.BookWelcome.route) {
+                    val viewModel = koinViewModel<AuthViewModel>()
+                    val authState by viewModel.authState.observeAsState()
+                    val context = LocalContext.current
+                    val webClientId = stringResource(R.string.default_web_client_id)
+                    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestIdToken(webClientId)
+                        .requestEmail()
+                        .build()
+
+                    val googleSignInClient = GoogleSignIn.getClient(context, gso)
+                    // Gọi kiểm tra trạng thái khi mở Composable
+                    LaunchedEffect(Unit) {
+                        viewModel.checkAuthState()
+                    }
+                    // Tạo launcher
+                    val launcher =
+                        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+                            try {
+                                val account = task.getResult(ApiException::class.java)
+                                account.idToken?.let { idToken ->
+                                    viewModel.signInWithGoogle(idToken)
+                                }
+                            } catch (e: ApiException) {
+                                Log.e("GoogleSignIn", "Google sign in failed", e)
+                            }
+                        }
+                    LaunchedEffect(authState) {
+                        if (authState == com.example.jitbook.book.theme.AuthState.Authenticated) {
+                            navController.navigate(Route.BookSubject.route) {
+                                popUpTo(Route.BookWelcome.route) {
+                                    inclusive = true
+                                }
+                            }
+                        }
+                    }
+                    WelcomeScreen(
+                        onLoginGoogleButtonClicked = {
+                            val intent = googleSignInClient.signInIntent
+                            launcher.launch(intent)
+
+                        },
+                        onLoginButtonClicked = {
+                            navController.navigate(Route.BookLogin.route)
+                        },
+                        onSignUpButtonClicked = {
+                            navController.navigate(Route.BookSignUp.route)
+                        },
+                        modifier = modifier
+                    )
+                }
                 composable(Route.BookFavorite.route) {
                     val viewModel = koinViewModel<FavoriteViewModel>()
                     val selectedBookViewModel =
                         it.sharedKoinViewModel<SelectedBookViewModel>(navController)
 
+
+
                     LaunchedEffect(true) {
+                        viewModel.fetchFavoriteBooks()
                         selectedBookViewModel.onBookSelected(null)
                     }
 
@@ -125,7 +205,6 @@ fun BookNavigationHost(
                     )
                 }
                 composable(Route.BookSubject.route) {
-                    val viewModel = koinViewModel<SubjectBooksViewModel>()
                     val selectedBookViewModel =
                         it.sharedKoinViewModel<SelectedBookViewModel>(navController)
 
@@ -135,7 +214,7 @@ fun BookNavigationHost(
                     SubjectScreen(
                         selectedBookViewModel = selectedBookViewModel,
                         navController = navController,
-                        viewModel = viewModel,
+                        viewModel = subjectViewModel,
                         modifier = modifier
                     )
                 }
@@ -182,6 +261,7 @@ fun BookNavigationHost(
                     val selectedBookViewModel =
                         it.sharedKoinViewModel<SelectedBookViewModel>(navController)
                     val viewModel = koinViewModel<BookDetailViewModel>()
+                    val authViewModel = koinViewModel<AuthViewModel>()
                     val selectedBook by selectedBookViewModel.selectedBook.collectAsStateWithLifecycle()
 
                     LaunchedEffect(selectedBook) {
@@ -192,8 +272,8 @@ fun BookNavigationHost(
                     }
 
                     BookDetailScreenRoot(
+                        authViewModel = authViewModel,
                         viewModel = viewModel,
-
                         onBackClick = {
                             navController.navigateUp()
                         }

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
@@ -34,21 +35,23 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.jitbook.book.theme.JITBookTheme
 @Composable
 fun InputRating(
-    onSubmitClicked: (rating: Int, description: String) -> Unit,
+    rating: Int,
+    description: String,
+    onRatingChanged: (Int) -> Unit,
+    onDescriptionChanged: (String) -> Unit,
+    onSubmitClicked: () -> Unit,
+    onCancel: () -> Unit,
 ) {
-
-    var rating by remember { mutableStateOf(0) }
-    var description by remember { mutableStateOf("") }
-
     var isEditing by remember { mutableStateOf(false) }
 
+
     val focusManager = LocalFocusManager.current
-    val focusRequester = remember { FocusRequester() }
 
 
     Column(
@@ -72,22 +75,20 @@ fun InputRating(
                     modifier = Modifier
                         .size(37.dp)
                         .clickable {
-                            rating = i
-
+                            onRatingChanged(i)
                         }
                 )
             }
         }
         InputDisplay(
             value = description,
-            onValueChange = {
-                description = it
-            },
+            onValueChange = onDescriptionChanged ,
             label = "Comment",
             modifier = Modifier.fillMaxWidth()
                 .onFocusChanged { focusState ->
                     isEditing = focusState.isFocused
                 }
+
         )
 
         Spacer(modifier = Modifier.padding(8.dp))
@@ -115,10 +116,8 @@ fun InputRating(
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(
                     onClick = {
-                        onSubmitClicked(rating, description)
-                        description = ""
-                        isEditing = false
                         focusManager.clearFocus()
+                        onSubmitClicked()
                     },
                     modifier = Modifier.weight(1.3f),
                     colors = ButtonDefaults.buttonColors(
@@ -146,13 +145,13 @@ fun BookRatingPreview() {
         darkTheme = true,
         dynamicColor = false,
     ) {
-        InputRating(
-//            onRatingChanged = {},
-//            onDescriptionChanged = {},
-            onSubmitClicked = { rating, description ->
-                println("Rating: $rating, Description: $description")
-            }
-        )
+//        InputRating(
+////            onRatingChanged = {},
+////            onDescriptionChanged = {},
+//            onSubmitClicked = { rating, description ->
+//                println("Rating: $rating, Description: $description")
+//            }
+//        )
     }
 
 }

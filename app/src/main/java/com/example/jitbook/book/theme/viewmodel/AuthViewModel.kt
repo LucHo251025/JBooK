@@ -1,13 +1,23 @@
 package com.example.jitbook.book.theme.viewmodel
 
 import android.net.Uri
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.jitbook.book.theme.AuthState
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.auth.auth
+import com.google.firebase.functions.functions
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class AuthViewModel : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -17,9 +27,24 @@ class AuthViewModel : ViewModel() {
     private val _currentUser = MutableLiveData<FirebaseUser?>()
     val currentUser: LiveData<FirebaseUser?> = _currentUser
 
+    var isLoading by mutableStateOf(false)
+        private set
+
+    // Thêm vào đầu ViewModel
+    var savedOtp by mutableStateOf<String?>(null)
+        private set
+
+    fun updateOtp(otp: String) {
+        savedOtp = otp
+    }
+
+
+
     init {
         _currentUser.value = auth.currentUser
     }
+
+
 
     fun checkAuthState() {
         if (auth.currentUser == null) {
@@ -127,6 +152,20 @@ class AuthViewModel : ViewModel() {
         _currentUser.postValue(null)
     }
 
+    fun signInWithGoogle(idToken: String) {
+        _authState.value = AuthState.Loading
+
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    updateUserOnSuccess()
+                } else {
+                    _authState.value =
+                        AuthState.Error(task.exception?.message ?: "Google sign-in failed")
+                }
+            }
+    }
 
     fun confirmPasswordReset(code: String, newPassword: String) {
         _authState.value = AuthState.Loading

@@ -36,22 +36,20 @@ import coil.compose.AsyncImage
 import com.example.jitbook.R
 import kotlin.math.round
 
-
 @Composable
-fun BookCard(
+fun BookCardNew(
     book: com.example.jitbook.book.data.model.Book,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
     width: Dp = 220.dp,
     imageHeight: Dp = 250.dp,
-) {
+){
     Column(
         modifier = modifier
             .clickable(onClick = onClick),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         Card(
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier
@@ -68,7 +66,6 @@ fun BookCard(
                 contentAlignment = Alignment.Center
             ) {
 
-
                 AsyncImage(
                     model = book.imageUrl,
                     contentDescription = book.title,
@@ -76,13 +73,12 @@ fun BookCard(
                         .fillMaxWidth()
                         .height(imageHeight)
                         .clip(RoundedCornerShape(12.dp)),
-                    contentScale = ContentScale.Crop,
                     placeholder = painterResource(id = R.drawable.image_break),
                     error = painterResource(id = R.drawable.image_break)
                 )
 
-
             }
+
         }
 
         Column(
@@ -94,8 +90,8 @@ fun BookCard(
             horizontalAlignment = Alignment.CenterHorizontally,
 
             ) {
+            Spacer(modifier = Modifier.height(4.dp))
 
-            // Tên phim
             Text(
                 text = book.title,
                 style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
@@ -104,43 +100,18 @@ fun BookCard(
                 color = MaterialTheme.colorScheme.onSecondary,
             )
 
-
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Rating
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.Star,
-                    contentDescription = null,
-                    tint = Color.Yellow,
-                    modifier = Modifier.size(16.dp)
-                )
-                Text(
-                    text = "${round((book.averageRating ?: 0.0) * 10) / 10.0}",
-                    color = MaterialTheme.colorScheme.onSecondary,
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                book.authors.firstOrNull()?.let { authorName ->
-                    Text(
-                        text = authorName,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colorScheme.onSecondary,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
+
+
         }
     }
-
 }
-
 
 @Preview
 @Composable
-fun BookCardPreview() {
-    BookCard(
+fun BookCardNewPreview() {
+    BookCardNew(
         com.example.jitbook.book.data.model.Book(
             id = "1",
             title = "Book Title Example ",

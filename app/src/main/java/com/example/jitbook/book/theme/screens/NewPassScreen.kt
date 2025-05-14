@@ -39,7 +39,9 @@ import com.example.jitbook.book.theme.viewmodel.AuthViewModel
 
 @Composable
 fun NewPassScreen(
+    email: String,
     viewModel: AuthViewModel,
+    onVerifyClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var newPassword by remember { mutableStateOf("") }

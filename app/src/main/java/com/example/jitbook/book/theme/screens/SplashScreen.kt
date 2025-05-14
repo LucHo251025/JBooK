@@ -31,6 +31,7 @@ import com.example.jitbook.R
 import com.example.jitbook.book.theme.AuthState
 import com.example.jitbook.book.theme.JITBookTheme
 import com.example.jitbook.book.theme.components.FallingDots
+import com.example.jitbook.book.theme.components.LoadingSpinner
 import com.example.jitbook.book.theme.viewmodel.AuthViewModel
 import okhttp3.Route
 
@@ -84,10 +85,9 @@ fun SplashScreen(
                 color = MaterialTheme.colorScheme.onSecondary,
                 textAlign = TextAlign.Center,
             )
-            CircularProgressIndicator(
-                color = MaterialTheme.colorScheme.primary,
-                strokeWidth = 4.dp,
-                modifier = Modifier.size(32.dp)
+            LoadingSpinner(
+                modifier = Modifier
+                    .size(80.dp)
             )
         }
 

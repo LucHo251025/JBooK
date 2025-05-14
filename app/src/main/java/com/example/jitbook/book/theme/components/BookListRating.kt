@@ -10,22 +10,18 @@ import java.util.Calendar
 
 @Composable
 fun BookListRating(
+    currentUser: String,
     ratings: List<Rating>,
-    onRatingClicked: (Rating) -> Unit,
+    onEditClicked: (Rating) -> Unit,
+    onDeleteClicked: (Rating) -> Unit,
 ) {
-//    LazyColumn {
-//        items(ratings) { rating ->
-//            BookRating(
-//                ratings = rating,
-//                onClick = { onRatingClicked(rating) }
-//            )
-//        }
-//    }
 
     ratings.forEach { rating ->
         BookRating(
             ratings = rating,
-            onClick = { onRatingClicked(rating) }
+            isShowMore = if(rating.userId == currentUser ) true else false,
+            onEditClicked = { onEditClicked(rating) },
+            onDeleteClicked = { onDeleteClicked(rating) }
         )
     }
 }
@@ -61,7 +57,11 @@ fun BookListRatingPreview() {
                     timestamp = java.sql.Timestamp(Timestamp.now().seconds * 1000)
                 )
             ),
-            onRatingClicked = {}
+            currentUser = "1",
+            onEditClicked = {
+            },
+            onDeleteClicked = {
+            }
         )
     }
 

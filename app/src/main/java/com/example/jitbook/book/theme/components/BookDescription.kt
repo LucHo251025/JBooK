@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -44,7 +45,10 @@ fun BookDescription(
         )
         Spacer(modifier = Modifier.height(8.dp))
         if(isLoading){
-            CircularProgressIndicator()
+            LoadingSpinner(
+                modifier = Modifier
+                    .size(80.dp)
+            )
         }else {
             Text(
                 text = description ?: "No description available",

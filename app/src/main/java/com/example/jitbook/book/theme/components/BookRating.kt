@@ -10,6 +10,8 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,8 +30,12 @@ import com.example.jitbook.book.theme.JITBookTheme
 @Composable
 fun BookRating(
     ratings: Rating,
-    onClick: () -> Unit,
+    isShowMore: Boolean = true,
+    onEditClicked: (Rating) -> Unit = {},
+    onDeleteClicked: (Rating) -> Unit = {},
     ) {
+    val expanded = remember { mutableStateOf(false) }
+
     Card(
         shape = RoundedCornerShape(12.dp),
         elevation = 2.dp,
@@ -60,7 +66,7 @@ fun BookRating(
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = ratings.userName?: "Anonymous",
+                        text = ratings.userName ?: "Anonymous",
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
                         color = MaterialTheme.colorScheme.onBackground
@@ -94,14 +100,34 @@ fun BookRating(
                         fontSize = 14.sp
                     )
                 }
-                Spacer(modifier = Modifier.width(8.dp))
-//                IconButton(onClick = { /* TODO: More actions */ }) {
-//                    Icon(
-//                        imageVector = Icons.Default.MoreVert,
-//                        contentDescription = "More",
-//                        tint = MaterialTheme.colorScheme.onBackground,
-//                    )
-//                }
+//                Spacer(modifier = Modifier.width(8.dp))
+
+                if (isShowMore) {
+                    IconButton(onClick = { expanded.value = true }) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = "More",
+                            tint = MaterialTheme.colorScheme.onBackground,
+                        )
+                        DropdownMenu(
+                            expanded = expanded.value,
+                            onDismissRequest = { expanded.value = false }
+                        ) {
+                            DropdownMenuItem(onClick = {
+                                expanded.value = false
+                                onEditClicked(ratings)
+                            }) {
+                                Text("Edit")
+                            }
+                            DropdownMenuItem(onClick = {
+                                expanded.value = false
+                                onDeleteClicked(ratings)
+                            }) {
+                                Text("Delete")
+                            }
+                        }
+                    }
+                }
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -123,6 +149,7 @@ fun PreviewBookReviewItem() {
 
         BookRating(
             ratings = Rating(
+                reviewId = "1",
                 userId = "1",
                 userName = "John Doe",
                 imageUrl = null,
@@ -130,7 +157,7 @@ fun PreviewBookReviewItem() {
                 comment = "Great book!",
                 timestamp = java.sql.Timestamp(System.currentTimeMillis())
             ),
-            onClick = {}
+
         )
     }
 }

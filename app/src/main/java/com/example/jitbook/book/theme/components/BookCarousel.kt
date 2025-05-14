@@ -62,10 +62,13 @@ fun BookCarousel(
     ) {
         Text(
             text = "Now Playing",
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
             color = Color.White,
             modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
         )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
 
         HorizontalPager(
             count = books.size,
@@ -90,7 +93,7 @@ fun BookCarousel(
                     }
                     .padding(8.dp)
             ) {
-                BookCard(
+                BookCardNew(
                     book = books[page],
                     width = cardWidth,
                     onClick = {onBookClick(books[page])},

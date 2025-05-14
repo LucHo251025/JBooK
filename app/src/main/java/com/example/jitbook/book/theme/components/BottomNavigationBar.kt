@@ -1,5 +1,6 @@
 package com.example.jitbook.book.theme.components
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,12 +25,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.jitbook.book.app.Route
 import com.example.jitbook.book.theme.JITBookTheme
@@ -61,33 +65,94 @@ sealed class NavItem {
         )
 }
 
+//@Composable
+//fun BottomNavigationBar(navController: NavController) {
+//    val navItems = listOf(NavItem.Home, NavItem.Search, NavItem.List, NavItem.Profile)
+//    var selectedItem by rememberSaveable { mutableStateOf(0) }
+//
+//    NavigationBar(
+//        modifier = Modifier,
+//        containerColor = MaterialTheme.colorScheme.background,
+//        contentColor = MaterialTheme.colorScheme.primary
+//    ) {
+//        navItems.forEachIndexed { index, item ->
+//            val scale by animateFloatAsState(
+//                targetValue = if (selectedItem == index) 1.25f else 1f,
+//                label = "nav_item_scale"
+//            )
+//            val labelAlpha by animateFloatAsState(
+//                targetValue = if (selectedItem == index) 1f else 0f,
+//                label = "nav_item_label_alpha"
+//            )
+//            NavigationBarItem(
+//                alwaysShowLabel = false,
+//                icon = { Icon(item.icon, contentDescription = item.title,modifier = Modifier.scale(scale)) },
+//                label = { Text(
+//                   text =item.title,
+//                    fontWeight = FontWeight.Bold,
+//                    modifier = Modifier.alpha(labelAlpha)
+//
+//                ) },
+//                selected = selectedItem == index,
+//                onClick = {
+//                    selectedItem = index
+//                    navController.navigate(item.path) {
+//                        navController.graph.startDestinationRoute?.let { route ->
+//                            popUpTo(route) { saveState = true }
+//                        }
+//                        launchSingleTop = true
+//                        restoreState = true
+//                    }
+//                },
+//                colors = NavigationBarItemDefaults.colors(
+//                    selectedIconColor = MaterialTheme.colorScheme.primary,
+//                    selectedTextColor = MaterialTheme.colorScheme.primary,
+//                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+//                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+//                    indicatorColor = Color.Transparent
+//
+//                )
+//            )
+//        }
+//    }
+//
+//}
+//
+
 @Composable
 fun BottomNavigationBar(navController: NavController) {
     val navItems = listOf(NavItem.Home, NavItem.Search, NavItem.List, NavItem.Profile)
-    var selectedItem by rememberSaveable { mutableStateOf(0) }
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
 
     NavigationBar(
-        modifier = Modifier,
         containerColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.primary
     ) {
         navItems.forEachIndexed { index, item ->
+            val selected = currentRoute == item.path
+            val scale by animateFloatAsState(
+                targetValue = if (selected) 1.25f else 1f,
+                label = "nav_item_scale"
+            )
+            val labelAlpha by animateFloatAsState(
+                targetValue = if (selected) 1f else 0f,
+                label = "nav_item_label_alpha"
+            )
+
             NavigationBarItem(
-                alwaysShowLabel = true,
-                icon = { Icon(item.icon, contentDescription = item.title) },
-                label = { Text(
-                   text =item.title,
-                    fontWeight = FontWeight.Bold,
-                ) },
-                selected = selectedItem == index,
+                alwaysShowLabel = false,
+                icon = { Icon(item.icon, contentDescription = item.title, modifier = Modifier.scale(scale)) },
+                label = { Text(item.title, fontWeight = FontWeight.Bold, modifier = Modifier.alpha(labelAlpha)) },
+                selected = selected,
                 onClick = {
-                    selectedItem = index
-                    navController.navigate(item.path) {
-                        navController.graph.startDestinationRoute?.let { route ->
-                            popUpTo(route) { saveState = true }
+                    if (currentRoute != item.path) {
+                        navController.navigate(item.path) {
+                            popUpTo(navController.graph.startDestinationRoute ?: "") {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(
@@ -95,15 +160,12 @@ fun BottomNavigationBar(navController: NavController) {
                     selectedTextColor = MaterialTheme.colorScheme.primary,
                     unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    indicatorColor = Color.Transparent // 👉 Không có nền bo tròn phía sau
-
+                    indicatorColor = Color.Transparent
                 )
             )
         }
     }
-
 }
-
 
 @Preview
 @Composable

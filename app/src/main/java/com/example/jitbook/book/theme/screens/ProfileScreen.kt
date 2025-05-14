@@ -146,7 +146,10 @@ fun ProfileScreen(
                     .fillMaxWidth()
                     .clickable {
                         authViewModel.logout()
-                        navController.navigate(Route.BookLogin.route)
+                        navController.navigate(Route.BookLogin.route) {
+                            popUpTo(0) { inclusive = true }
+                            launchSingleTop = true
+                        }
                     }
                     .padding(horizontal = 20.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically

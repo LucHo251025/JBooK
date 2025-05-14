@@ -2,6 +2,7 @@ package com.example.jitbook.book.theme.screens
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,6 +42,7 @@ import com.example.jitbook.R
 import com.example.jitbook.book.app.Route
 import com.example.jitbook.book.theme.AuthState
 import com.example.jitbook.book.theme.JITBookTheme
+import com.example.jitbook.book.theme.components.BookAlert
 import com.example.jitbook.book.theme.components.BookCheckBox
 import com.example.jitbook.book.theme.components.BookPasswordField
 import com.example.jitbook.book.theme.components.FallingDots
@@ -45,6 +50,7 @@ import com.example.jitbook.book.theme.components.InputDisplay
 import com.example.jitbook.book.theme.components.PrimaryButton
 import com.example.jitbook.book.theme.components.SocialButton
 import com.example.jitbook.book.theme.viewmodel.AuthViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun LoginScreen(
@@ -60,11 +66,33 @@ fun LoginScreen(
 
     val context = LocalContext.current
 
+    var showAlert by remember { mutableStateOf(false) }
+    var alertTitle by remember { mutableStateOf("") }
+    var alertMessage by remember { mutableStateOf("") }
+    var alertIcon by remember { mutableStateOf(Icons.Default.CheckCircle) }
+    var alertColor by remember { mutableStateOf(Color.Red) }
     LaunchedEffect(authState.value) {
         when (authState.value) {
-            is AuthState.Authenticated -> navController.navigate(Route.BookList.route)
-            is AuthState.Error -> Toast.makeText(context,
-                (authState.value as AuthState.Error).message, Toast.LENGTH_LONG).show()
+            is AuthState.Authenticated -> {
+                alertTitle = "Login Success"
+                alertMessage = "Welcome back to JITBook"
+                alertIcon = Icons.Default.CheckCircle
+                alertColor = Color(0xFFFFA500)
+                showAlert = true
+                delay(3000)
+                navController.navigate(Route.BookSubject.route)
+            }
+            is AuthState.Error -> {
+                alertTitle = "Login Failed"
+                alertMessage = (authState.value as AuthState.Error).message
+                alertIcon = Icons.Default.ErrorOutline
+                alertColor = Color.Red
+                showAlert = true
+                Toast.makeText(
+                    context,
+                    (authState.value as AuthState.Error).message, Toast.LENGTH_LONG
+                ).show()
+            }
             else -> Unit
         }
     }
@@ -155,7 +183,11 @@ fun LoginScreen(
                     text = "Forgot Password?",
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.primary,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .clickable {
+                            navController.navigate(Route.BookResetPassword.route)
+                        }
                 )
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -190,43 +222,31 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(50.dp))
 
-//                Row(
-//                    modifier = Modifier
-//                        .fillMaxWidth(),
-//                    verticalAlignment = Alignment.CenterVertically,
-//                    horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceEvenly
-//                ) {
-//                    SocialButton(
-//                        servicesIcon = painterResource(id = R.drawable.google),
-//                        onClick = { /*TODO*/ },
-//                        modifier = Modifier
-//
-//                    )
-//                    SocialButton(
-//                        servicesIcon = painterResource(id = R.drawable.facebook),
-//                        onClick = { /*TODO*/ },
-//                        modifier = Modifier
-//                    )
-//
-//                    SocialButton(
-//                        servicesIcon = painterResource(id = R.drawable.facebook),
-//                        onClick = { /*TODO*/ },
-//                        modifier = Modifier
-//
-//                    )
-//                }
-
                 Spacer(modifier = Modifier.height(30.dp))
 
                 PrimaryButton(
                     text = "Login",
                     onClick = {
                         authViewModel.login(email, password)
+
                     },
                     modifier = Modifier
 
                 )
             }
+        }
+
+        if(showAlert){
+            BookAlert(
+                title = alertTitle,
+                message = alertMessage,
+                icon = alertIcon,
+                color = alertColor,
+                isLoading = true,
+                onDismiss = {
+                    showAlert = false
+                },
+            )
         }
 
 
