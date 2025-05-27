@@ -38,10 +38,55 @@ class BookDetailViewModel(
         .removePrefix("/works/")
         .removeSuffix(".json")
 
+    private var readingStartTime: Long? = null
+
     init {
         viewModelScope.launch {
             launch { checkIfBookIsFavorite() }
             launch { fetchRatings(bookId) }
+        }
+    }
+
+    fun startReadingTimer() {
+        readingStartTime = System.currentTimeMillis()
+        Log.d("BookDetailViewModel", "startReadingTimer: readingStartTime = $readingStartTime")
+
+    }
+
+    fun updateReadingTime() {
+
+        val user = FirebaseAuth.getInstance().currentUser ?: return
+        val db = FirebaseFirestore.getInstance()
+        val userId = user.uid
+
+        val startTime = readingStartTime ?: run {
+            Log.e("BookDetailViewModel", "updateReadingTime: readingStartTime is null")
+            return
+        }
+        val endTime = System.currentTimeMillis()
+        val duration = endTime - startTime // milliseconds
+
+        val docId = "${userId}_$bookId"
+
+        val readingTimeRef = db.collection("readingLogs").document(docId)
+
+        db.runTransaction { transaction ->
+            val snapshot = transaction.get(readingTimeRef)
+            val existingTime = snapshot.getLong("duration") ?: 0L
+            val newDuration = existingTime + duration
+
+            transaction.set(readingTimeRef, mapOf(
+                "userId" to userId,
+                "bookId" to bookId,
+                "duration" to newDuration,
+                "lastRead" to FieldValue.serverTimestamp()
+            ))
+
+        }.addOnSuccessListener {
+            Log.d("BookDetailViewModel", "userId = $userId, bookId = $bookId, duration = $duration")
+            readingStartTime = null // reset timer
+        }.addOnFailureListener {
+            Log.e("BookDetailViewModel", "Failed to update reading time", it)
         }
     }
 

@@ -20,7 +20,7 @@ class SubjectBooksViewModel(
     val uiState: StateFlow<SubjectBooksUiState> = _uiState
     var fantasyBooks: List<Book>? = null
 
-    private val subjects = listOf("kids","romance", "fantasy", "history", "science_fiction","love")
+    private val subjects = listOf("kids","romance", "fantasy", "history", "science_fiction","thrillers","love")
     private val _selectedSubject = MutableStateFlow<String?>(null)
     val selectedSubject: StateFlow<String?> = _selectedSubject
 
@@ -41,7 +41,7 @@ class SubjectBooksViewModel(
 
         viewModelScope.launch {
             val booksMap = mutableMapOf<String, List<Book>>()
-            var errorMessage: String? = null
+            val failedSubjects = mutableListOf<String>()
 
             val results = subjects.map { subject ->
                 async {
@@ -52,16 +52,16 @@ class SubjectBooksViewModel(
             results.forEach { (subject, result) ->
                 result.onSuccess { books ->
                     booksMap[subject] = books
-                    if (subject == "fantasy" || subject == "romance") {
-                        fantasyBooks = books
-                    }
+//                    if (subject == "fantasy" || subject == "romance") {
+//                        fantasyBooks = books
+//                    }
                 }
 //                    .onError {
 //                    errorMessage = "Failed to load $subject books."
 //                }
             }
 
-            val randomBooks = fantasyBooks?.shuffled()?.take(5).orEmpty()
+            val randomBooks = booksMap["fantasy"]?.shuffled()?.take(8).orEmpty()
 
             _uiState.value = SubjectBooksUiState(
                 isLoading = false,

@@ -37,6 +37,7 @@ import com.example.jitbook.book.theme.BookListAction
 import com.example.jitbook.book.theme.BookListState
 import com.example.jitbook.book.theme.components.BookCarousel
 import com.example.jitbook.book.theme.components.BookList
+import com.example.jitbook.book.theme.components.BookListNew
 import com.example.jitbook.book.theme.components.BookSection
 import com.example.jitbook.book.theme.components.FallingDots
 import com.example.jitbook.book.theme.components.LoadingSpinner
@@ -174,7 +175,7 @@ fun SubjectSelectedView(
                 .fillMaxWidth()
                 .heightIn(max = 500.dp)
         ) {
-            BookList(
+            BookListNew(
                 books = books,
                 onBookClick = onBookClick,
                 modifier = Modifier.fillMaxSize()

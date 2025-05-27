@@ -90,6 +90,63 @@ fun BookList(
 
 }
 
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun BookListNew(
+    books: List<Book>,
+    onBookClick: (Book) -> Unit,
+    modifier: Modifier = Modifier,
+    scrollState: LazyGridState = rememberLazyGridState(),
+) {
+    val shownMap = remember { mutableStateMapOf<String, Boolean>() }
+
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        state = scrollState,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = 100.dp)
+
+    ) {
+
+        items(
+            items= books,
+            key = {it.id}
+        ) { book ->
+            var visible by remember {
+                mutableStateOf(shownMap[book.id] == true)
+            }
+
+            LaunchedEffect(book.id) {
+                if (shownMap[book.id] != true) {
+                    delay((book.id.hashCode().mod(5) * 50).toLong())
+                    visible = true
+                    shownMap[book.id] = true
+                }
+            }
+
+            AnimatedVisibility(
+                visible = visible,
+                enter = fadeIn() + slideInVertically(initialOffsetY = { it / 3 }),
+                exit = fadeOut()
+
+            ) {
+                BookCardNew(
+                    book = book,
+                    modifier = modifier
+                        .animateItemPlacement(),
+                    onClick = { onBookClick(book) },
+                    width = 145.dp,
+                    imageHeight = 210.dp,
+                )
+            }
+        }
+    }
+
+}
+
 @Preview
 @Composable
 fun BookListPreview() {

@@ -131,7 +131,7 @@ fun WelcomeContent(
                             fontWeight = FontWeight.Bold
                         )
                     ) {
-                        append("JITbook ")
+                        append("JBook ")
                     }
                     append("👋")
                 },

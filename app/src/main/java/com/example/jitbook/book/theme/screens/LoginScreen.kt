@@ -49,11 +49,13 @@ import com.example.jitbook.book.theme.components.FallingDots
 import com.example.jitbook.book.theme.components.InputDisplay
 import com.example.jitbook.book.theme.components.PrimaryButton
 import com.example.jitbook.book.theme.components.SocialButton
+import com.example.jitbook.book.theme.components.SocialGoogleButton
 import com.example.jitbook.book.theme.viewmodel.AuthViewModel
 import kotlinx.coroutines.delay
 
 @Composable
 fun LoginScreen(
+    onLoginGoogleButtonClicked: () -> Unit,
     navController: NavController,
     authViewModel: AuthViewModel,
     modifier: Modifier = Modifier
@@ -166,12 +168,12 @@ fun LoginScreen(
 
                 }
             )
-            Spacer(modifier = Modifier.height(15.dp))
-            Divider(
-                color = Color.LightGray,
-                thickness = 0.5.dp,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
+//            Spacer(modifier = Modifier.height(15.dp))
+//            Divider(
+//                color = Color.LightGray,
+//                thickness = 0.5.dp,
+//                modifier = Modifier.padding(vertical = 8.dp)
+//            )
 
             Spacer(modifier = Modifier.height(30.dp))
             Column(
@@ -220,9 +222,17 @@ fun LoginScreen(
 
                 }
 
-                Spacer(modifier = Modifier.height(50.dp))
-
-                Spacer(modifier = Modifier.height(30.dp))
+                Spacer(modifier = Modifier.height(20.dp))
+                SocialGoogleButton(
+                    servicesIcon = painterResource(id = R.drawable.google),
+                    servicesName = "Google",
+                    onClick = {
+                        onLoginGoogleButtonClicked()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(35.dp))
 
                 PrimaryButton(
                     text = "Login",
@@ -263,10 +273,10 @@ fun LoginPreview() {
         darkTheme = false,
         dynamicColor = false
     ) {
-        LoginScreen(
-            navController = NavController(context = LocalContext.current),
-            authViewModel = AuthViewModel()
-        )
+//        LoginScreen(
+//            navController = NavController(context = LocalContext.current),
+//            authViewModel = AuthViewModel()
+//        )
     }
 }
 

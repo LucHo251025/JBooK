@@ -59,8 +59,8 @@ fun BookTopBar(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            "JITBook", fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSecondary
+                            "JBook", fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                 },
@@ -72,7 +72,7 @@ fun BookTopBar(
                             Icon(
                                 Icons.Default.ArrowBack,
                                 contentDescription = "Back",
-                                tint = MaterialTheme.colorScheme.onSecondary
+                                tint = MaterialTheme.colorScheme.primary
                             )
                         }
                     }
@@ -83,8 +83,41 @@ fun BookTopBar(
             )
 
 
+        }
+        Route.BookLogin.route,Route.BookSignUp.route -> {
+            CenterAlignedTopAppBar(
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            painter = painterResource(id = R.drawable.logo),
+                            contentDescription = "Logo",
+                            modifier = Modifier.size(50.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            "JBook", fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                },
+                navigationIcon = {
+                        IconButton(onClick = {
+                            onBackClick()
+                        }) {
+                            Icon(
+                                Icons.Default.ArrowBack,
+                                contentDescription = "Back",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
 
-    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
+            )
+        }
+
 
     Route.BookProfile.route -> {
         CenterAlignedTopAppBar(
@@ -98,10 +131,13 @@ fun BookTopBar(
                         contentDescription = "Logo",
                         modifier = Modifier.size(50.dp)
                     )
-                    Text("Profile", color = MaterialTheme.colorScheme.onSecondary)
+                    Text("Profile", color = MaterialTheme.colorScheme.primary)
 
                 }
             },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.background
+            )
 
         )
     }
@@ -118,7 +154,7 @@ fun BookTopBar(
                         contentDescription = "Logo",
                         modifier = Modifier.size(50.dp)
                     )
-                    Text("BookDetail", color = MaterialTheme.colorScheme.onSecondary)
+                    Text("BookDetail", color = MaterialTheme.colorScheme.primary)
 
                 }
             },
@@ -127,10 +163,13 @@ fun BookTopBar(
                     Icon(
                         Icons.Default.ArrowBack,
                         contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.onSecondary
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
-            }
+            },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                    )
         )
     }
 
@@ -147,10 +186,13 @@ fun BookTopBar(
                         contentDescription = "Logo",
                         modifier = Modifier.size(50.dp)
                     )
-                    Text("Favorites", color = MaterialTheme.colorScheme.onSecondary)
+                    Text("Favorites", color = MaterialTheme.colorScheme.primary)
 
                 }
             },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.background
+            )
 
         )
     }
@@ -167,10 +209,13 @@ fun BookTopBar(
                         contentDescription = "Logo",
                         modifier = Modifier.size(50.dp)
                     )
-                    Text("Search Book", color = MaterialTheme.colorScheme.onSecondary)
+                    Text("Search Book", color = MaterialTheme.colorScheme.primary)
 
                 }
             },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.background
+            )
           
         )
     }

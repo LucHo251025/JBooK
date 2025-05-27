@@ -2,6 +2,7 @@ package com.example.jitbook.book.theme.components
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -58,12 +59,14 @@ fun BookCarousel(
 
 
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = "Now Playing",
             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onSecondary,
             modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
         )
 
@@ -106,7 +109,7 @@ fun BookCarousel(
         HorizontalPagerIndicator(
             pagerState = pagerState,
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            activeColor = Color.Yellow,
+            activeColor = MaterialTheme.colorScheme.primary,
             inactiveColor = Color.Gray
         )
     }

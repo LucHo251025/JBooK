@@ -7,12 +7,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.example.jitbook.book.data.model.Favorites
 
 class AppThemeViewModel: ViewModel() {
     private val _isDarkMode = mutableStateOf(false)
     val isDarkMode: State<Boolean> = _isDarkMode
 
     fun toggleDarkMode() {
+        val favorites: List<Favorites> = emptyList()
         _isDarkMode.value = !_isDarkMode.value
     }
 

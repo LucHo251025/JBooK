@@ -6,6 +6,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.MaterialTheme
@@ -15,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -33,7 +36,7 @@ fun BookRating(
     isShowMore: Boolean = true,
     onEditClicked: (Rating) -> Unit = {},
     onDeleteClicked: (Rating) -> Unit = {},
-    ) {
+) {
     val expanded = remember { mutableStateOf(false) }
 
     Card(
@@ -111,27 +114,61 @@ fun BookRating(
                         )
                         DropdownMenu(
                             expanded = expanded.value,
-                            onDismissRequest = { expanded.value = false }
+                            onDismissRequest = { expanded.value = false },
+                            modifier = Modifier
+                                .background(
+                                    color = MaterialTheme.colorScheme.surface,
+                                    shape = RoundedCornerShape(12.dp)
+                                )
                         ) {
-                            DropdownMenuItem(onClick = {
-                                expanded.value = false
-                                onEditClicked(ratings)
-                            }) {
-                                Text("Edit")
-                            }
-                            DropdownMenuItem(onClick = {
-                                expanded.value = false
-                                onDeleteClicked(ratings)
-                            }) {
-                                Text("Delete")
-                            }
+                            DropdownMenuItem(
+                                content = {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Default.Edit,
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            contentDescription = "Edit",
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            "Edit",
+                                            fontWeight = FontWeight.Bold,
+                                        )
+                                    }
+                                },
+                                onClick = {
+                                    expanded.value = false
+                                    onEditClicked(ratings)
+                                },
+                            )
+                            DropdownMenuItem(
+                                onClick = {
+                                    expanded.value = false
+                                    onDeleteClicked(ratings)
+                                },
+                                content = {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Default.Delete,
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            contentDescription = "Delete",
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            "Delete", fontWeight = FontWeight.Bold,
+                                        )
+                                    }
+                                })
+
                         }
                     }
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = ratings.comment?:"",
+                text = ratings.comment ?: "",
                 fontSize = 15.sp,
                 color = MaterialTheme.colorScheme.onBackground
             )
@@ -158,6 +195,6 @@ fun PreviewBookReviewItem() {
                 timestamp = java.sql.Timestamp(System.currentTimeMillis())
             ),
 
-        )
+            )
     }
 }

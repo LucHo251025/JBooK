@@ -1,6 +1,5 @@
 package com.example.jitbook.book.theme.screens
 
-import android.util.Log
 import android.webkit.CookieManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -15,9 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Colors
 import androidx.compose.material.Divider
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -59,7 +56,6 @@ import org.koin.androidx.compose.koinViewModel
 fun BookDetailScreenRoot(
     authViewModel: AuthViewModel,
     viewModel: BookDetailViewModel,
-    onBackClick: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     A(
@@ -67,10 +63,6 @@ fun BookDetailScreenRoot(
         viewModel = viewModel,
         state = state,
         onAction = { action ->
-            when (action) {
-                is BookDetailAction.OnBackClick -> onBackClick()
-                else -> Unit
-            }
             viewModel.onAction(action)
         }
     )
@@ -90,7 +82,9 @@ fun A(
             state = state,
             isFavorite = state.isFavorite,
             onFavoriteClick = { onAction(BookDetailAction.OnFavoriteClick) },
-            onBackClick = { onAction(BookDetailAction.OnBackClick) },
+            onBackClick = {
+                onAction(BookDetailAction.OnBackClick)
+                          },
             ratings = state.ratings,
             isLoadings = state.isLoading,
             modifier = Modifier.fillMaxSize()
@@ -308,7 +302,6 @@ fun BookDetailScreenPreview() {
 
         BookDetailScreenRoot(
             viewModel = viewModel,
-            onBackClick = { /* Handle back click */ },
             authViewModel = koinViewModel<AuthViewModel>(),
         )
     }

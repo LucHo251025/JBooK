@@ -3,8 +3,10 @@ package com.example.jitbook.screen
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -23,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,6 +42,7 @@ import com.example.jitbook.book.theme.JITBookTheme
 import com.example.jitbook.book.theme.components.FallingDots
 import com.example.jitbook.book.theme.viewmodel.AppThemeViewModel
 import com.example.jitbook.book.theme.viewmodel.AuthViewModel
+import kotlin.io.path.Path
 
 @Composable
 fun ProfileScreen(
@@ -51,10 +55,7 @@ fun ProfileScreen(
     val user = currentUser
 
     var isEditing by remember { mutableStateOf(false) }
-    var editedName by remember(currentUser?.displayName) {
-        mutableStateOf(currentUser?.displayName ?: "User Name")
-    }
-    var editedEmail by remember { mutableStateOf(currentUser?.email ?: "Email") }
+
     val avatarPainter = if (user?.photoUrl != null) {
         rememberAsyncImagePainter(model = user.photoUrl)
     } else {
@@ -76,59 +77,106 @@ fun ProfileScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(160.dp)
+                .align(Alignment.TopCenter)
+        ) {
+            val width = size.width
+            val height = size.height
+
+            drawPath(
+                path = androidx.compose.ui.graphics.Path().apply {
+                    moveTo(0f, 0f)
+                    lineTo(width, 0f)
+                    lineTo(width, height * 0.75f)
+                    cubicTo(
+                        width * 0.75f, height,
+                        width * 0.25f, height * 0.75f,
+                        0f, height
+                    )
+                    close()
+                },
+                color = Color(0xFFFFCC80)
+            )
+        }
+
         FallingDots(
             modifier = Modifier
                 .fillMaxSize()
                 .zIndex(0f) // nằm sau nội dung
         )
+
         Column(
             modifier = Modifier
-                .fillMaxSize()
-
         ) {
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(top = 60.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Image(
-                    painter = avatarPainter, // Thay bằng avatar thật nếu có
-                    contentDescription = "Avatar",
-                    modifier = Modifier
-                        .size(70.dp)
-                        .clip(CircleShape)
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = currentUser?.displayName ?: "User Name",
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSecondary,
-                        fontSize = 18.sp
-                    )
-                    Text(
-                        text = currentUser?.email ?: "Email",
-                        color = Color.Gray,
-                        fontSize = 14.sp
-                    )
-                }
-                IconButton(onClick = {
-                    isEditing = true
-                }) {
-                    Icon(
-                        Icons.Default.Edit,
-                        contentDescription = "Edit",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
 
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
+                Box(
+                    modifier = Modifier
+                        .size(120.dp) // lớn hơn một chút
+                        .zIndex(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(110.dp)
+                            .clip(CircleShape)
+                            .border(5.dp, Color.White, CircleShape)
+                    ) {
+                        Image(
+                            painter = avatarPainter,
+                            contentDescription = "Avatar",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(CircleShape)
+                        )
+                    }
+
+                    // Nút edit góc dưới
+                    IconButton(
+                        onClick = { isEditing = true },
+                        modifier = Modifier
+                            .size(32.dp)
+                            .align(Alignment.BottomEnd)
+                            .background(MaterialTheme.colorScheme.primary, CircleShape)
+                            .border(2.dp, Color.White, CircleShape)
+                    ) {
+                        Icon(
+                            Icons.Default.Edit,
+                            contentDescription = "Edit",
+                            tint = Color.White,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = currentUser?.displayName ?: "Ronald Richards",
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    fontSize = 20.sp
+                )
+
+                Text(
+                    text = currentUser?.email ?: "Email",
+                    color = Color.Gray,
+                    fontSize = 14.sp
+                )
+            }
 
             ProfileMenuItem(
                 icon = R.drawable.ic_dark_mode,
-                iconBg = Color(0xFFF3F6FA),
+                iconBg = MaterialTheme.colorScheme.background,
                 iconTint = Color(0xFF226DB4),
                 title = "Dark Mode",
                 trailing = {
@@ -146,7 +194,7 @@ fun ProfileScreen(
                     .fillMaxWidth()
                     .clickable {
                         authViewModel.logout()
-                        navController.navigate(Route.BookLogin.route) {
+                        navController.navigate(Route.BookWelcome.route) {
                             popUpTo(0) { inclusive = true }
                             launchSingleTop = true
                         }
@@ -184,75 +232,74 @@ fun ProfileScreen(
 
 }
 
-    @Composable
-    fun EditProfileDialog(
-        currentName: String,
-        currentPhoto: String,
-        onDismiss: () -> Unit,
-        onSave: (String, String) -> Unit
-    ) {
-        val context = LocalContext.current
-        var name by remember { mutableStateOf(currentName) }
-        var selectedPhotoUri by remember { mutableStateOf<Uri?>(null) }
+@Composable
+fun EditProfileDialog(
+    currentName: String,
+    currentPhoto: String,
+    onDismiss: () -> Unit,
+    onSave: (String, String) -> Unit
+) {
+    var name by remember { mutableStateOf(currentName) }
+    var selectedPhotoUri by remember { mutableStateOf<Uri?>(null) }
 
-        // Dùng launcher để chọn ảnh từ thư viện
-        val imagePickerLauncher = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.GetContent()
-        ) { uri: Uri? ->
-            selectedPhotoUri = uri
-        }
+    // Dùng launcher để chọn ảnh từ thư viện
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        selectedPhotoUri = uri
+    }
 
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            title = { Text("Chỉnh sửa thông tin") },
-            text = {
-                Column {
-                    OutlinedTextField(
-                        value = name,
-                        onValueChange = { name = it },
-                        label = { Text("Tên hiển thị") },
-                        singleLine = true
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Chỉnh sửa thông tin") },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Tên hiển thị") },
+                    singleLine = true
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Button(
+                    onClick = { imagePickerLauncher.launch("image/*") },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(Icons.Default.Image, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Chọn ảnh từ thư viện")
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+
+                val previewUri = selectedPhotoUri ?: currentPhoto.takeIf { it.isNotBlank() }
+                    ?.let { Uri.parse(it) }
+                previewUri?.let { uri ->
+                    Image(
+                        painter = rememberAsyncImagePainter(uri),
+                        contentDescription = "Ảnh đại diện",
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(CircleShape)
+                            .align(Alignment.CenterHorizontally)
                     )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Button(
-                        onClick = { imagePickerLauncher.launch("image/*") },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Icon(Icons.Default.Image, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Chọn ảnh từ thư viện")
-                    }
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    val previewUri = selectedPhotoUri ?: currentPhoto.takeIf { it.isNotBlank() }
-                        ?.let { Uri.parse(it) }
-                    previewUri?.let { uri ->
-                        Image(
-                            painter = rememberAsyncImagePainter(uri),
-                            contentDescription = "Ảnh đại diện",
-                            modifier = Modifier
-                                .size(100.dp)
-                                .clip(CircleShape)
-                                .align(Alignment.CenterHorizontally)
-                        )
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    val photoUrl = selectedPhotoUri?.toString() ?: currentPhoto
-                    onSave(name, photoUrl)
-                }) {
-                    Text("Lưu")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = onDismiss) {
-                    Text("Hủy")
                 }
             }
-        )
-    }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                val photoUrl = selectedPhotoUri?.toString() ?: currentPhoto
+                onSave(name, photoUrl)
+            }) {
+                Text("Lưu")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Hủy")
+            }
+        }
+    )
+}
 
 
 @Composable
@@ -266,7 +313,7 @@ fun ProfileMenuItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {  }
+            .clickable { }
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -302,14 +349,15 @@ fun ProfileMenuItem(
 @Composable
 fun ProfileScreenPreview() {
     JITBookTheme(
-        darkTheme = false,
+        darkTheme = true,
         dynamicColor = false,
     ) {
-//        ProfileScreen(
-//            navController = NavHostController(LocalContext.current),
-//            authViewModel = AuthViewModel(),
-//            appThemeViewModel = AppThemeViewModel(),
-//        )
+
+        ProfileScreen(
+            navController = NavHostController(LocalContext.current),
+            authViewModel = AuthViewModel(),
+            appThemeViewModel = AppThemeViewModel()
+        )
 
     }
 }

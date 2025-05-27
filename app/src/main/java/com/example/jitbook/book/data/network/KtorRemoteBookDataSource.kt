@@ -59,9 +59,6 @@ class KtorRemoteBookDataSource(
         }
     }
 
-
-
-
     override suspend fun getFavoriteBooksByIds(bookIds: List<String>): Result<List<FavoriteBookDto>, DataError.Remote> {
         val favoriteBooks = mutableListOf<FavoriteBookDto>()
 
