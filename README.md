@@ -27,7 +27,7 @@ JBook là một ứng dụng đọc sách hiện đại, hỗ trợ người dù
 
 | Màn hình chính | Giao diện đọc sách | TTS & Đánh dấu |
 |----------------|---------------------|----------------|
-| ![Home](assets/home.png) | ![Reader](assets/reader.png) | ![TTS](assets/tts.png) |
+| ![Home](assets/Ảnh1.png) | ![Reader](assets/Ảnh2.png) | ![TTS](assets/Ảnh3.png) |
 
 > *Thêm hình ảnh vào thư mục `assets/` để hiển thị tại đây.*
 
