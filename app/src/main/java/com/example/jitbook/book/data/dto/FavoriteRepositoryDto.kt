@@ -1,0 +1,9 @@
+package com.example.jitbook.book.data.dto
+
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class FavoriteRepositoryDto(
+    @SerialName("docs") val docs: List<FavoriteBookDto>
+)
